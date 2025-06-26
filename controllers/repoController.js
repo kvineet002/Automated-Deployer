@@ -65,28 +65,34 @@ export const handleDeploymentLogs = (req, res) => {
     const tempPath = path.join('./cloned_repos', repoName);
     const composePath = path.join(tempPath, 'docker-compose.yml');
 
+    // Set SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const child = spawn('docker', ['compose','-f', composePath, 'up', '--build']);
+    // Use spawn for streaming
+    const child = spawn('docker', ['compose', '-f', composePath, 'up', '--build']);
 
+    // Stream stdout
     child.stdout.on('data', (data) => {
         res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
     });
 
+    // Stream stderr
     child.stderr.on('data', (data) => {
         res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
     });
 
+    // Close
     child.on('close', (code) => {
         res.write(`data: ✅ Deployment finished with exit code ${code}\n\n`);
         res.end();
     });
 
+    // Client disconnected
     req.on('close', () => {
-        child.kill();
+        child.kill('SIGINT');
         res.end();
     });
 };

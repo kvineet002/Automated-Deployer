@@ -23,7 +23,9 @@
 
     <% if (startLogs) { %>
         <h1>🚀 Deployment Logs</h1>
-        <pre id="logs">Streaming logs...\n</pre>
+        <pre id="logs">Streaming logs...
+</pre>
+
         <script>
            const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>');
             eventSource.onmessage = (e) => {
