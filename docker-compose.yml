@@ -5,6 +5,7 @@ services:
     build: .
     container_name: voomly-backend
     user: root
+    restart: always
     ports:
       - "3002:3000"
     volumes:
