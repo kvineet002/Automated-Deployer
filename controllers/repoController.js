@@ -67,7 +67,7 @@ export const handleDeploymentLogs = (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const child = spawn('docker-compose', ['-f', composePath, 'up', '--build']);
+    const child = spawn('docker', ['compose','-f', composePath, 'up', '--build']);
 
     child.stdout.on('data', (data) => {
         res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
