@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  backend:
+    build: .
+    container_name: voomly-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock          # Docker control
+      - ./cloned_repos:/usr/src/app/cloned_repos           # Cloned projects
+      - /etc/nginx/sites-available:/nginx/sites-available  # Nginx config (write)
+      - /etc/nginx/sites-enabled:/nginx/sites-enabled      # Nginx symlinks
+    environment:
+      - NODE_ENV=development
