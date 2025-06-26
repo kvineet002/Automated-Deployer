@@ -76,8 +76,8 @@ export const handleDeploymentLogs = (req, res) => {
         '-f',
         composePath,
         'up',
-        '--build',
-        '--progress=plain'
+        '-d', 
+        '--build'
     ], {
         env: {
             ...process.env,
