@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Deploying... | Voomly</title>
+    <title>Stack Detected | Voomly</title>
 </head>
 <body>
+    <h1>Detected Stack for:</h1>
+    <p><%= repo %></p>
+    <h2>→ <%= stack %></h2>
+
+    <% if (stack === 'React') { %>
+        <form action="/deploy" method="post">
+            <input type="hidden" name="repo" value="<%= repo %>">
+            <button type="submit">🚀 Deploy This App</button>
+        </form>
+    <% } else { %>
+        <p>Deployment not supported for this stack yet.</p>
+    <% } %>
   <h1>🚀 Deployment Logs</h1>
   <pre id="logs"></pre>
 
@@ -19,5 +31,7 @@
       document.getElementById('logs').textContent += '\n❌ Connection closed.';
     };
   </script>
+    <br>
+    <a href="/">Check another repo</a>
 </body>
 </html>
