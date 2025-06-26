@@ -71,7 +71,8 @@ export const handleDeploymentLogs = (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
-  const process = spawn('docker compose', ['-f', composePath, 'up', '--build']);
+const process = spawn('docker', ['compose', '-f', composePath, 'up', '--build']);
+
 
   process.stdout.on('data', (data) => {
     res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
