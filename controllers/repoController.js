@@ -56,7 +56,6 @@ export const handleContainerization = async (req, res) => {
         encodedRepo:encodeURIComponent(repo),
     });
 };
-
 export const handleDeploymentLogs = (req, res) => {
     const { repo } = req.query;
     if (!repo) return res.status(400).end('No repo in query');
@@ -65,32 +64,53 @@ export const handleDeploymentLogs = (req, res) => {
     const tempPath = path.join('./cloned_repos', repoName);
     const composePath = path.join(tempPath, 'docker-compose.yml');
 
-    // Set SSE headers
+    // Set headers for SSE
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    // Use spawn for streaming
-    const child = spawn('docker', ['compose', '-f', composePath, 'up', '--build']);
+    // Spawn docker compose with plain output to disable buffering
+    const child = spawn('docker', [
+        'compose',
+        '-f',
+        composePath,
+        'up',
+        '--build',
+        '--progress=plain'
+    ], {
+        env: {
+            ...process.env,
+            // Helps force flushing output
+            FORCE_COLOR: '1'
+        }
+    });
 
-    // Stream stdout
+    // Stream stdout line by line
     child.stdout.on('data', (data) => {
-        res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+        const lines = data.toString().split('\n');
+        lines.forEach(line => {
+            if (line.trim()) {
+                res.write(`data: ${line}\n\n`);
+            }
+        });
     });
 
-    // Stream stderr
+    // Stream stderr line by line
     child.stderr.on('data', (data) => {
-        res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+        const lines = data.toString().split('\n');
+        lines.forEach(line => {
+            if (line.trim()) {
+                res.write(`data: ${line}\n\n`);
+            }
+        });
     });
 
-    // Close
     child.on('close', (code) => {
         res.write(`data: ✅ Deployment finished with exit code ${code}\n\n`);
         res.end();
     });
 
-    // Client disconnected
     req.on('close', () => {
         child.kill('SIGINT');
         res.end();
