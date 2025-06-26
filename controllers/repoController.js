@@ -29,7 +29,7 @@ export const handleRepoSubmit = async (req, res) => {
         }
 
         // Show deploy page with button, but no logs yet
-        res.render('deploy', {
+        res.render('result', {
             stack,
             repo: githubUrl,
             startLogs: false,
@@ -47,7 +47,7 @@ export const handleContainerization = async (req, res) => {
     if (!repo) return res.status(400).send('❌ No repo provided.');
 
     // Just render the same `deploy.ejs`, but now with `startLogs: true`
-    res.render('deploy', {
+    res.render('result', {
         repo,
         stack,
         startLogs: true,
