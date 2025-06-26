@@ -8,6 +8,16 @@
     <p><%= repo %></p>
     <h2>→ <%= stack %></h2>
 
+    <% if (stack === 'React') { %>
+        <form action="/deploy" method="post">
+            <input type="hidden" name="repo" value="<%= repo %>">
+            <button type="submit">🚀 Deploy This App</button>
+        </form>
+    <% } else { %>
+        <p>Deployment not supported for this stack yet.</p>
+    <% } %>
+
+    <br>
     <a href="/">Check another repo</a>
 </body>
 </html>
