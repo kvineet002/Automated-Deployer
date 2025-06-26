@@ -45,7 +45,7 @@ export const handleContainerization = async (req, res) => {
     const composePath = path.join(tempPath, 'docker-compose.yml');
 
     try {
-        exec(`docker-compose --project-directory ${composePath} up -d --build`, (err, stdout, stderr) => {
+        exec(`docker compose --project-directory ${composePath} up -d --build`, (err, stdout, stderr) => {
             if (err) {
                 console.error('Docker error:', stderr);
                 return res.status(500).send('❌ Failed to deploy.');
