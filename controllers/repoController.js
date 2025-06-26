@@ -34,8 +34,6 @@ export const handleRepoSubmit = async (req, res) => {
         res.render('form', { error: 'Failed to detect stack.' });
     }
 };
-
-import path from 'path';
 import { exec } from 'child_process';
 
 export const handleContainerization = async (req, res) => {
