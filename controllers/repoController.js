@@ -53,7 +53,7 @@ export const handleContainerization = async (req, res) => {
         repo,
         stack,
         startLogs: true,
-        encodedRepo,
+        encodedRepo:encodeURIComponent(repo),
     });
 };
 
