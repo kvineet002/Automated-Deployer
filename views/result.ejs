@@ -25,7 +25,7 @@
         <h1>🚀 Deployment Logs</h1>
         <pre id="logs">Streaming logs...\n</pre>
         <script>
-            const eventSource = new EventSource('/deploy-stream?repo=<%= encodeURIComponent(repo) %>');
+           const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>');
             eventSource.onmessage = (e) => {
                 document.getElementById('logs').textContent += e.data + "\n";
             };

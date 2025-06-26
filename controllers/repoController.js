@@ -29,11 +29,13 @@ export const handleRepoSubmit = async (req, res) => {
         }
 
         // Show deploy page with button, but no logs yet
-        res.render('result', {
-            stack,
-            repo: githubUrl,
-            startLogs: false,
-        });
+       res.render('result', {
+    repo: githubUrl,
+    stack,
+    startLogs: false,
+    encodedRepo: encodeURIComponent(githubUrl)
+});
+
     } catch (err) {
         console.error(err);
         res.render('form', { error: '❌ Failed to detect stack.' });
