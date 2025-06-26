@@ -34,7 +34,7 @@ export const handleRepoSubmit = async (req, res) => {
         res.render('form', { error: 'Failed to detect stack.' });
     }
 };
-import { exec } from 'child_process';
+import { exec,spawn } from 'child_process';
 
 export const handleContainerization = async (req, res) => {
     const { repo } = req.body;
@@ -58,4 +58,36 @@ export const handleContainerization = async (req, res) => {
         console.error(err);
         res.status(500).send('❌ Deployment failed.');
     }
+};
+
+export const handleDeploymentLogs = (req, res) => {
+  const repo = decodeURIComponent(Object.keys(req.query)[0]);
+  const repoName = repo.split('/').pop().replace('.git', '');
+  const tempPath = path.join('./cloned_repos', repoName);
+  const composePath = path.join(tempPath, 'docker-compose.yml');
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const process = spawn('docker compose', ['-f', composePath, 'up', '--build']);
+
+  process.stdout.on('data', (data) => {
+    res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+  });
+
+  process.stderr.on('data', (data) => {
+    res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+  });
+
+  process.on('close', (code) => {
+    res.write(`data: 🚀 Deployment finished with exit code ${code}\n\n`);
+    res.end();
+  });
+
+  req.on('close', () => {
+    process.kill();
+    res.end();
+  });
 };

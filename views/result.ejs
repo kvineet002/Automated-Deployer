@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stack Detected | Voomly</title>
+  <title>Deploying... | Voomly</title>
 </head>
 <body>
-    <h1>Detected Stack for:</h1>
-    <p><%= repo %></p>
-    <h2>→ <%= stack %></h2>
+  <h1>🚀 Deployment Logs</h1>
+  <pre id="logs"></pre>
 
-    <% if (stack === 'React') { %>
-        <form action="/deploy" method="post">
-            <input type="hidden" name="repo" value="<%= repo %>">
-            <button type="submit">🚀 Deploy This App</button>
-        </form>
-    <% } else { %>
-        <p>Deployment not supported for this stack yet.</p>
-    <% } %>
+  <script>
+    const eventSource = new EventSource('/deploy-stream?<%= repo %>');
 
-    <br>
-    <a href="/">Check another repo</a>
+    eventSource.onmessage = (e) => {
+      document.getElementById('logs').textContent += e.data + "\n";
+    };
+
+    eventSource.onerror = () => {
+      eventSource.close();
+      document.getElementById('logs').textContent += '\n❌ Connection closed.';
+    };
+  </script>
 </body>
 </html>
