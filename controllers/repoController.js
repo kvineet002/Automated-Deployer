@@ -13,7 +13,6 @@ const generatePORT = () => {
 
 export const handleRepoSubmit = async (req, res) => {
     const { githubUrl } = req.body;
-
     if (!githubUrl) return res.render('form', { error: 'GitHub URL is required' });
 
     const repoName = githubUrl.split('/').pop().replace('.git', '');
@@ -22,73 +21,69 @@ export const handleRepoSubmit = async (req, res) => {
     try {
         await cloneRepo(githubUrl, tempPath);
         const stack = detectStack(tempPath);
+
         if (stack === 'React') {
-        addDockerfile(tempPath);
-        const port=generatePORT();
-        addDockerComposefile(port, tempPath);
-    }
-        // fs.rmSync(tempPath, { recursive: true, force: true });
-        res.render('result', { stack, repo: githubUrl });
+            addDockerfile(tempPath);
+            const port = generatePORT();
+            addDockerComposefile(port, tempPath);
+        }
+
+        // Show deploy page with button, but no logs yet
+        res.render('deploy', {
+            stack,
+            repo: githubUrl,
+            startLogs: false,
+        });
     } catch (err) {
         console.error(err);
-        res.render('form', { error: 'Failed to detect stack.' });
+        res.render('form', { error: '❌ Failed to detect stack.' });
     }
 };
+
 import { exec,spawn } from 'child_process';
 
 export const handleContainerization = async (req, res) => {
-    const { repo } = req.body;
-    if (!repo) return res.status(400).send('No repo provided.');
+    const { repo, stack } = req.body;
+    if (!repo) return res.status(400).send('❌ No repo provided.');
+
+    // Just render the same `deploy.ejs`, but now with `startLogs: true`
+    res.render('deploy', {
+        repo,
+        stack,
+        startLogs: true,
+    });
+};
+
+export const handleDeploymentLogs = (req, res) => {
+    const { repo } = req.query;
+    if (!repo) return res.status(400).end('No repo in query');
 
     const repoName = repo.split('/').pop().replace('.git', '');
     const tempPath = path.join('./cloned_repos', repoName);
     const composePath = path.join(tempPath, 'docker-compose.yml');
 
-    try {
-        exec(`docker compose -f ${composePath} up -d --build`, (err, stdout, stderr) => {
-            if (err) {
-                console.error('Docker error:', stderr);
-                return res.status(500).send('❌ Failed to deploy.');
-            }
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
 
-            console.log('Docker deployed successfully:', stdout);
-            res.send(`✅ Deployment started for ${repoName}!<br><a href="/">Go Back</a>`);
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('❌ Deployment failed.');
-    }
-};
+    const child = spawn('docker-compose', ['-f', composePath, 'up', '--build']);
 
-export const handleDeploymentLogs = (req, res) => {
-  const repo = decodeURIComponent(Object.keys(req.query)[0]);
-  const repoName = repo.split('/').pop().replace('.git', '');
-  const tempPath = path.join('./cloned_repos', repoName);
-  const composePath = path.join(tempPath, 'docker-compose.yml');
+    child.stdout.on('data', (data) => {
+        res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+    });
 
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
+    child.stderr.on('data', (data) => {
+        res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
+    });
 
-const process = spawn('docker', ['compose', '-f', composePath, 'up', '--build']);
+    child.on('close', (code) => {
+        res.write(`data: ✅ Deployment finished with exit code ${code}\n\n`);
+        res.end();
+    });
 
-
-  process.stdout.on('data', (data) => {
-    res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
-  });
-
-  process.stderr.on('data', (data) => {
-    res.write(`data: ${data.toString().replace(/\n/g, '\ndata: ')}\n\n`);
-  });
-
-  process.on('close', (code) => {
-    res.write(`data: 🚀 Deployment finished with exit code ${code}\n\n`);
-    res.end();
-  });
-
-  req.on('close', () => {
-    process.kill();
-    res.end();
-  });
+    req.on('close', () => {
+        child.kill();
+        res.end();
+    });
 };
