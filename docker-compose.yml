@@ -5,7 +5,7 @@ services:
     build: .
     container_name: voomly-backend
     ports:
-      - "3000:3000"
+      - "3002:3000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock          # Docker control
       - ./cloned_repos:/usr/src/app/cloned_repos           # Cloned projects
