@@ -28,6 +28,7 @@ RUN npm install -g serve
 COPY package* ./
 RUN npm install
 COPY . .
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
     `;
     fs.writeFileSync(path.join(repoPath, 'Dockerfile'), dockerfileContent.trim());
