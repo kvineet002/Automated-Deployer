@@ -132,15 +132,19 @@
     a.back-link:hover {
       text-decoration: underline;
     }
+    .anchor-link {
+      color: var(--accent);
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>🚀 Deploy | Voomly</h1>
+      <h1> Deploy | Voomly</h1>
       <h2>Detected Stack:</h2>
-      <div class="highlight"><%= stack %></div>
-      <div class="highlight">Repo: <%= repo %></div>
+      <strong><%= stack %></strong>
+     <div> <strong>App URL:</strong>  <div class="highlight"><%= repo %></div></div>
 
       <% if (stack === 'React') { %>
         <% if (!startLogs) { %>
@@ -158,7 +162,7 @@
 
       <% if (startLogs) { %>
         <div class="message">🟡 Wait for the full logs to finish loading. This may take a moment.</div>
-        <p><strong>App URL:</strong> <a href="https://<%= subdomain %>.voomly.xyz" target="_blank">https://<%= subdomain %>.voomly.xyz</a></p>
+        <p><strong>App URL:</strong> <a class="anchor-link" href="https://<%= subdomain %>.voomly.xyz" target="_blank">https://<%= subdomain %>.voomly.xyz</a></p>
         <div class="logs" id="logs">⏳ Streaming logs...</div>
         <script>
           const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
@@ -173,7 +177,7 @@
       <% } %>
 
       <a class="back-link" href="/">← Check another repo</a>
-    </div>
+    </d>
   </div>
 </body>
 </html>
