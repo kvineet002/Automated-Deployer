@@ -16,7 +16,7 @@ services:
         context: .
     ports:
       - "${port}:3000"
-    command: sh -c "cd /app && serve -s build"
+    command: sh -c "cd /app && serve -s dist"
   `;
 
   fs.writeFileSync(path.join(repoPath, 'docker-compose.yml'), content.trim());
