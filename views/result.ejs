@@ -1,154 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Deploy | Voomly</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  <meta charset="UTF-8" />
+  <title>Deploy | Voomly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --text-light: #f8fafc;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+    }
 
-        .card {
-            background-color: #1e293b;
-            padding: 32px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 600px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-        }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px 20px;
+      min-height: 100vh;
+    }
 
-        h1, h2 {
-            text-align: center;
-            font-weight: 600;
-        }
+    .container {
+      width: 100%;
+      max-width: 700px;
+    }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: #334155;
-            color: #f1f5f9;
-            font-size: 16px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
+    .card {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
 
-        input:focus {
-            outline: 2px solid #38bdf8;
-        }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #38bdf8;
-            color: #0f172a;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
+    h2 {
+      text-align: center;
+      font-weight: 500;
+      font-size: 20px;
+      margin-top: 0;
+    }
 
-        button:hover {
-            background-color: #0ea5e9;
-        }
+    .highlight {
+      color: #a5f3fc;
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-        .logs {
-            background-color: #0f172a;
-            color: #f8fafc;
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-family: monospace;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #334155;
-        }
+    form {
+      margin-top: 20px;
+    }
 
-        a {
-            color: #38bdf8;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-        }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 10px;
+      background: #334155;
+      color: var(--text-light);
+      font-size: 16px;
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    input:focus {
+      outline: 2px solid var(--accent);
+    }
 
-        .highlight {
-            color: #a5f3fc;
-        }
-        
-     .message {
-    background-color: #fef3c7;     /* Light amber background */
-    border-left: 4px solid #facc15; /* Amber border */
-    padding: 12px 16px;
-    border-radius: 10px;
-    margin-top: 20px;
-    font-size: 15px;
-    color: #78350f;               /* Dark amber text for better contrast */
-    font-weight: 500;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-    </style>
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent);
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--accent-dark);
+    }
+
+    .message {
+      background-color: #fef3c7;
+      border-left: 4px solid #facc15;
+      color: #78350f;
+      font-size: 15px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      margin-top: 20px;
+    }
+
+    .logs {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+
+    a.back-link {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a.back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
     <div class="card">
-        <h1> Deploy | Voomly</h1>
-        <h2>Detected Stack for:</h2>
-        <p class="highlight"><%= repo %></p>
-        <h2>→ <%= stack %></h2>
+      <h1>🚀 Deploy | Voomly</h1>
+      <h2>Detected Stack:</h2>
+      <div class="highlight"><%= stack %></div>
+      <div class="highlight">Repo: <%= repo %></div>
 
-        <% if (stack === 'React') { %>
-            <% if (!startLogs) { %>
-                <form action="/deploy" method="POST">
-                    <input type="hidden" name="repo" value="<%= repo %>">
-                    <input type="hidden" name="stack" value="<%= stack %>">
-                    <input type="hidden" name="port" value="<%= port %>">
-                    <input type="text" name="subdomain" placeholder="Enter subdomain (e.g., myapp)" required>
-                    <button type="submit"> Deploy This App</button>
-                </form>
-            <% } %>
-        <% } else { %>
-            <p> Deployment not supported for this stack yet.</p>
+      <% if (stack === 'React') { %>
+        <% if (!startLogs) { %>
+          <form action="/deploy" method="POST">
+            <input type="hidden" name="repo" value="<%= repo %>" />
+            <input type="hidden" name="stack" value="<%= stack %>" />
+            <input type="hidden" name="port" value="<%= port %>" />
+            <input type="text" name="subdomain" placeholder="Enter subdomain (e.g., myapp)" required />
+            <button type="submit">Deploy This App</button>
+          </form>
         <% } %>
+      <% } else { %>
+        <div class="message">❌ Deployment not supported for this stack yet.</div>
+      <% } %>
 
-        <% if (startLogs) { %>
-            <h2>Deployment Logs</h2>
-            <p><strong>Repo:</strong> <%= repo %></p>
-            <p><strong>Stack:</strong> <%= stack %></p>
-            <p><a href="https://<%= subdomain %>.voomly.xyz" target="_blank">🔗 https://<%= subdomain %>.voomly.xyz</a></p>
-            <div class="message">
-                Wait for the full logs to finish loading. This may take a few some time.
-            </div>
-            <div class="logs" id="logs">⏳ Streaming logs...</div>
-            <script>
-                const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
-                eventSource.onmessage = (e) => {
-                    document.getElementById('logs').textContent += e.data + "\n";
-                };
-                eventSource.onerror = () => {
-                    eventSource.close();
-                    document.getElementById('logs').textContent += '\n All commands executed successfully.';
-                };
-            </script>
-        <% } %>
+      <% if (startLogs) { %>
+        <div class="message">🟡 Wait for the full logs to finish loading. This may take a moment.</div>
+        <p><strong>App URL:</strong> <a href="https://<%= subdomain %>.voomly.xyz" target="_blank">https://<%= subdomain %>.voomly.xyz</a></p>
+        <div class="logs" id="logs">⏳ Streaming logs...</div>
+        <script>
+          const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
+          eventSource.onmessage = (e) => {
+              document.getElementById('logs').textContent += e.data + "\n";
+          };
+          eventSource.onerror = () => {
+              eventSource.close();
+              document.getElementById('logs').textContent += '\n✅ All commands executed successfully.';
+          };
+        </script>
+      <% } %>
 
-        <a href="/">← Check another repo</a>
+      <a class="back-link" href="/">← Check another repo</a>
     </div>
+  </div>
 </body>
 </html>
