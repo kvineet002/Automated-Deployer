@@ -172,7 +172,8 @@ server {
 
         // Run certbot
         execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
-        res.write(`data: ✅ NGINX configured for ${subdomainSafe}.voomly.xyz\n\n`);
+        res.write(`event: nginx-ready\ndata: ${subdomainSafe}.voomly.xyz\n\n`);
+
     } catch (err) {
         console.error('❌ Failed to configure NGINX:', err.message);
         res.write(`data: ❌ Failed to configure NGINX: ${err.message}\n\n`);

@@ -180,18 +180,33 @@
 
       <% if (startLogs) { %>
         <div class="message">🟡 Wait for the full logs to finish loading. This may take a moment.</div>
-        <p><strong>App URL:</strong> <a class="anchor-link" href="https://<%= subdomain %>.voomly.xyz" target="_blank">https://<%= subdomain %>.voomly.xyz</a></p>
+      <p id="site-link" style="display:none;">
+  <strong>App URL:</strong>
+  <a class="anchor-link" id="site-anchor" href="#" target="_blank">🔗 Your app is live</a>
+</p>
+
         <div class="logs" id="logs">⏳ Streaming logs...</div>
-        <script>
-          const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
-          eventSource.onmessage = (e) => {
-              document.getElementById('logs').textContent += e.data + "\n";
-          };
-          eventSource.onerror = () => {
-              eventSource.close();
-              document.getElementById('logs').textContent += '\n✅ All commands executed successfully.';
-          };
-        </script>
+       <script>
+  const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
+
+  eventSource.onmessage = (e) => {
+    document.getElementById('logs').textContent += e.data + "\n";
+  };
+
+  eventSource.addEventListener('nginx-ready', function(e) {
+    const url = `https://${e.data}`;
+    const link = document.getElementById('site-anchor');
+    link.href = url;
+    link.textContent = `🔗 ${url}`;
+    document.getElementById('site-link').style.display = 'block';
+  });
+
+  eventSource.onerror = () => {
+    eventSource.close();
+    document.getElementById('logs').textContent += '\n All commands executed successfully.';
+  };
+</script>
+
       <% } %>
 
       <a class="back-link" href="/">← Check another repo</a>
