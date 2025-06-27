@@ -81,89 +81,52 @@ export const handleContainerization = async (req, res) => {
 
 };
 
-export const handleDeploymentLogs = (req, res) => {
-    const { repo,subdomainSafe,port } = req.query;
-    if (!repo) return res.status(400).end('No repo in query');
+export const handleDeploymentLogs = (ws, req) => {
+  const urlParams = new URLSearchParams(req.url.replace('/?', ''));
+  const repo = urlParams.get('repo');
+  const subdomainSafe = urlParams.get('subdomainSafe');
+  const port = urlParams.get('port');
 
-    const repoName = repo.split('/').pop().replace('.git', '');
-    const tempPath = path.join('./cloned_repos', repoName);
-    const composePath = path.join(tempPath, 'docker-compose.yml');
+  if (!repo || !subdomainSafe || !port) {
+    ws.send('❌ Missing parameters');
+    ws.close();
+    return;
+  }
 
-    // Set headers for SSE
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders();
+  const repoName = repo.split('/').pop().replace('.git', '');
+  const tempPath = path.join('./cloned_repos', repoName);
+  const composePath = path.join(tempPath, 'docker-compose.yml');
 
-    // Spawn docker compose with plain output to disable buffering
-// Step 1: Build first
-const build = spawn('docker', [
-  'compose',
-  '-f',
-  composePath,
-  'build'
-]);
+  const build = spawn('docker', ['compose', '-f', composePath, 'build']);
 
-build.stdout.on('data', (data) => {
-    const text = data.toString();
-    console.log('[build stdout]', text);
-    text.split('\n').forEach(line => {
-        if (line.trim()) res.write(`data: ${line}\n\n`);
-    });
-});
+  build.stdout.on('data', (data) => ws.send(data.toString()));
+  build.stderr.on('data', (data) => ws.send(data.toString()));
 
-build.stderr.on('data', (data) => {
-    const text = data.toString();
-    console.error('[build stderr]', text);
-    text.split('\n').forEach(line => {
-        if (line.trim()) res.write(`data: ${line}\n\n`);
-    });
-});
-
-build.on('close', (code) => {
+  build.on('close', (code) => {
     if (code !== 0) {
-        res.write(`data: ❌ Build failed with exit code ${code}\n\n`);
-        res.end();
-        return;
+      ws.send(`❌ Build failed with exit code ${code}`);
+      ws.close();
+      return;
     }
 
-    // Step 2: Now run
-    const run = spawn('docker', [
-        'compose',
-        '-f',
-        composePath,
-        'up',
-        '-d'
-    ]);
+    const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
 
-    run.stdout.on('data', (data) => {
-        const text = data.toString();
-        console.log('[run stdout]', text);
-        text.split('\n').forEach(line => {
-            if (line.trim()) res.write(`data: ${line}\n\n`);
-        });
-    });
+    run.stdout.on('data', (data) => ws.send(data.toString()));
+    run.stderr.on('data', (data) => ws.send(data.toString()));
 
-    run.stderr.on('data', (data) => {
-        const text = data.toString();
-        console.error('[run stderr]', text);
-        text.split('\n').forEach(line => {
-            if (line.trim()) res.write(`data: ${line}\n\n`);
-        });
-    });
+    run.on('close', () => {
+      ws.send(`Deployment successful!Assigning your subdomain...`);
 
-  run.on('close', (runCode) => {
-    res.write(`data: ✅ Deployment finished with exit code ${runCode}\n\n`);
-    const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
-    const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
-    // Now that the container is up, configure NGINX
-    const confContent = `
+      const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+      const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+
+      const confContent = `
 server {
     listen 80;
     server_name ${subdomainSafe}.voomly.xyz;
 
     location / {
-        proxy_pass http://localhost:${port};  # Replace dynamically if needed
+        proxy_pass http://localhost:${port};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -171,28 +134,22 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
-    `;
+      `;
 
-    try {
-        // Write or overwrite config
+      try {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
 
-        // Reload NGINX
         execSync('sudo nginx -s reload');
-
-        // Run certbot
         execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
-        res.write(`event: nginx-ready\ndata: ${subdomainSafe}.voomly.xyz\n\n`);
 
-    } catch (err) {
-        console.error('❌ Failed to configure NGINX:', err.message);
-        res.write(`data: ❌ Failed to configure NGINX: ${err.message}\n\n`);
-    }
+        ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
+        ws.send(`All done! Your app is now live at http://${subdomainSafe}.voomly.xyz`);
+      } catch (err) {
+        ws.send(`❌ Failed to configure NGINX: ${err.message}`);
+      }
 
-    res.end();
-});
-
-});
-
-};
+      ws.close();
+    });
+  });
+}
