@@ -284,15 +284,13 @@
                                                 <% } %>
 
 
-                                                    <div class="logs" id="logs"></div>
-                                                   
+                                                    <div class="logs" id="logs">⏳ Streaming logs...<br></div>
                                           <script>
   const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>`);
 
   socket.onmessage = (event) => {
     const logsEl = document.getElementById('logs');
     const data = event.data;
-    document.getElementById('logs').textContent = '⏳ Streaming logs...\n';
 
     if (data.startsWith('nginx-ready:')) {
       const url = `https://${data.split(':')[1]}`;
