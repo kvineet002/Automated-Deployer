@@ -333,6 +333,7 @@
                 const repoUrl = document.getElementById('githubUrl').value.trim();
                 const selectedBranch = document.getElementById('branch').value.trim() || "main";
                 const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)(\.git)?$/);
+                if(!repoUrl)return;
                 if (!repoUrl || !match) {
                     alert("Invalid GitHub URL");
                     return;
