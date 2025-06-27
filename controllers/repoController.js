@@ -123,24 +123,30 @@ export const handleDeploymentLogs = (req, res) => {
     });
 
     // Stream stdout line by line
-    child.stdout.on('data', (data) => {
-        const lines = data.toString().split('\n');
-        lines.forEach(line => {
-            if (line.trim()) {
-                res.write(`data: ${line}\n\n`);
-            }
-        });
+// STDOUT
+child.stdout.on('data', (data) => {
+    const text = data.toString();
+    console.log('[stdout]', text);  // ✅ Print to console
+    const lines = text.split('\n');
+    lines.forEach(line => {
+        if (line.trim()) {
+            res.write(`data: ${line}\n\n`);
+        }
     });
+});
 
-    // Stream stderr line by line
-    child.stderr.on('data', (data) => {
-        const lines = data.toString().split('\n');
-        lines.forEach(line => {
-            if (line.trim()) {
-                res.write(`data: ${line}\n\n`);
-            }
-        });
+// STDERR
+child.stderr.on('data', (data) => {
+    const text = data.toString();
+    console.error('[stderr]', text); // ✅ Print to console
+    const lines = text.split('\n');
+    lines.forEach(line => {
+        if (line.trim()) {
+            res.write(`data: ${line}\n\n`);
+        }
     });
+});
+
 
     child.on('close', (code) => {
         res.write(`data: ✅ Deployment finished with exit code ${code}\n\n`);
