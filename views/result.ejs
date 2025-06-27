@@ -136,15 +136,33 @@
       color: var(--accent);
       text-decoration: none;
     }
+      .meta-info {
+    margin: 20px 0;
+  }
+
+  .meta-info h2 {
+    margin-bottom: 5px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .highlight strong {
+    font-weight: 600;
+  }
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
       <h1> Deploy | Voomly</h1>
-      <h2>Detected Stack:</h2>
-      <strong><%= stack %></strong>
-     <div> <strong>App URL:</strong>  <div class="highlight"><%= repo %></div></div>
+      <div class="meta-info">
+  <h2>Detected Stack:</h2>
+  <p class="highlight"><strong><%= stack %></strong></p>
+
+  <h2>GitHub Repository:</h2>
+  <p class="highlight"><%= repo %></p>
+</div>
 
       <% if (stack === 'React') { %>
         <% if (!startLogs) { %>
