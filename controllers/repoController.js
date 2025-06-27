@@ -101,7 +101,7 @@ export const handleDeploymentLogs = (ws, req) => {
 ws.send(`\n`)
 const output = execSync('curl -s http://ip-api.com/line/?fields=city,regionName,country');
 const location = output.toString().trim().split('\n').join(', ');
-ws.send(`🌍 Server location: ${location}\n`);
+ws.send(`Server location: ${location}\n`);
 const stepTimers = new Map();
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
