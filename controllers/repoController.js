@@ -82,11 +82,7 @@ server {
 
         // Write config file
         fs.writeFileSync(confPath, confContent);
-
-        // Create symlink if not exists
-        if (!fs.existsSync(enabledPath)) {
-            fs.symlinkSync(confPath, enabledPath);
-        }
+        fs.writeFileSync(enabledPath, confContent);
 
         // Reload NGINX
         try {
