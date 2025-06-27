@@ -115,13 +115,13 @@ export const handleDeploymentLogs = (req, res) => {
         '-f',
         composePath,
         'up',
+        '-d',
         '--build'
     ], {
-        env: {
-            ...process.env,
-            // Helps force flushing output
-            FORCE_COLOR: '1'
-        }
+  env: {
+    ...process.env,
+    DOCKER_BUILDKIT: '0'
+  }
     });
 
     // Stream stdout line by line
