@@ -22,9 +22,9 @@ export const handleRepoSubmit = async (req, res) => {
         await cloneRepo(githubUrl, tempPath);
         const stack = detectStack(tempPath);
 
+        const port = generatePORT();
         if (stack === 'React') {
             addDockerfile(tempPath);
-            const port = generatePORT();
             addDockerComposefile(port, tempPath);
         }
 
