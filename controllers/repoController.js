@@ -110,51 +110,66 @@ export const handleDeploymentLogs = (req, res) => {
     res.flushHeaders();
 
     // Spawn docker compose with plain output to disable buffering
-    const child = spawn('docker', [
+// Step 1: Build first
+const build = spawn('docker', [
+  'compose',
+  '-f',
+  composePath,
+  'build'
+]);
+
+build.stdout.on('data', (data) => {
+    const text = data.toString();
+    console.log('[build stdout]', text);
+    text.split('\n').forEach(line => {
+        if (line.trim()) res.write(`data: ${line}\n\n`);
+    });
+});
+
+build.stderr.on('data', (data) => {
+    const text = data.toString();
+    console.error('[build stderr]', text);
+    text.split('\n').forEach(line => {
+        if (line.trim()) res.write(`data: ${line}\n\n`);
+    });
+});
+
+build.on('close', (code) => {
+    if (code !== 0) {
+        res.write(`data: ❌ Build failed with exit code ${code}\n\n`);
+        res.end();
+        return;
+    }
+
+    // Step 2: Now run
+    const run = spawn('docker', [
         'compose',
         '-f',
         composePath,
         'up',
-        '--build'
-    ], {
-  env: {
-    ...process.env
-  }
+        '-d'
+    ]);
+
+    run.stdout.on('data', (data) => {
+        const text = data.toString();
+        console.log('[run stdout]', text);
+        text.split('\n').forEach(line => {
+            if (line.trim()) res.write(`data: ${line}\n\n`);
+        });
     });
 
-    // Stream stdout line by line
-// STDOUT
-child.stdout.on('data', (data) => {
-    const text = data.toString();
-    console.log('[stdout]', text);  // ✅ Print to console
-    const lines = text.split('\n');
-    lines.forEach(line => {
-        if (line.trim()) {
-            res.write(`data: ${line}\n\n`);
-        }
+    run.stderr.on('data', (data) => {
+        const text = data.toString();
+        console.error('[run stderr]', text);
+        text.split('\n').forEach(line => {
+            if (line.trim()) res.write(`data: ${line}\n\n`);
+        });
+    });
+
+    run.on('close', (runCode) => {
+        res.write(`data: ✅ Deployment finished with exit code ${runCode}\n\n`);
+        res.end();
     });
 });
 
-// STDERR
-child.stderr.on('data', (data) => {
-    const text = data.toString();
-    console.error('[stderr]', text); // ✅ Print to console
-    const lines = text.split('\n');
-    lines.forEach(line => {
-        if (line.trim()) {
-            res.write(`data: ${line}\n\n`);
-        }
-    });
-});
-
-
-    child.on('close', (code) => {
-        res.write(`data: ✅ Deployment finished with exit code ${code}\n\n`);
-        res.end();
-    });
-
-    req.on('close', () => {
-        child.kill('SIGINT');
-        res.end();
-    });
 };
