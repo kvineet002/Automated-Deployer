@@ -101,7 +101,7 @@ export const handleDeploymentLogs = (ws, req) => {
 
 let currentStep = null;
 let stepStartTime = null;
-
+ws.send(`\n`)
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
@@ -143,7 +143,8 @@ build.stdout.on('data', (data) => {
     const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
 
 const stepTimers = new Map();
-
+//print my linux server location
+ws.send(`\n`)
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {

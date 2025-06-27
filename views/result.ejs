@@ -284,31 +284,31 @@
                                                 <% } %>
 
 
-                                                    <div class="logs" id="logs">⏳ Streaming logs...<br></div>
-                                          <script>
-  const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>`);
+                                                    <div class="logs" id="logs">⏳ Streaming logs...<br/></div>
+                                                    <script>
+                                                        const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>`);
 
-  socket.onmessage = (event) => {
-    const logsEl = document.getElementById('logs');
-    const data = event.data;
+                                                        socket.onmessage = (event) => {
+                                                            const logsEl = document.getElementById('logs');
+                                                            const data = event.data;
 
-    if (data.startsWith('nginx-ready:')) {
-      const url = `https://${data.split(':')[1]}`;
-      const anchor = document.getElementById('site-anchor');
-      anchor.href = url;
-      anchor.textContent = `🔗 ${url}`;
-      document.getElementById('site-link').style.display = 'block';
-    } else {
-      logsEl.textContent += data + '\n';
-      logsEl.scrollTop = logsEl.scrollHeight;
-    }
-  };
+                                                            if (data.startsWith('nginx-ready:')) {
+                                                                const url = `https://${data.split(':')[1]}`;
+                                                                const anchor = document.getElementById('site-anchor');
+                                                                anchor.href = url;
+                                                                anchor.textContent = `🔗 ${url}`;
+                                                                document.getElementById('site-link').style.display = 'block';
+                                                            } else {
+                                                                logsEl.textContent += data + '\n';
+                                                                logsEl.scrollTop = logsEl.scrollHeight;
+                                                            }
+                                                        };
 
-  socket.onerror = () => {
-    const logsEl = document.getElementById('logs');
-    logsEl.textContent += '\n⚠️ WebSocket connection closed.';
-  };
-</script>
+                                                        socket.onerror = () => {
+                                                            const logsEl = document.getElementById('logs');
+                                                            logsEl.textContent += '\n⚠️ WebSocket connection closed.';
+                                                        };
+                                                    </script>
 
 
                                                     <% } %>
