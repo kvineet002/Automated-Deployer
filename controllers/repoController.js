@@ -97,25 +97,25 @@ export const handleDeploymentLogs = (ws, req) => {
   const tempPath = path.join('./cloned_repos', repoName);
   const composePath = path.join(tempPath, 'docker-compose.yml');
 
-  const build = spawn('docker', ['compose', '-f', composePath, 'build']);
+//   const build = spawn('docker', ['compose', '-f', composePath, 'build']);
 
-  build.stdout.on('data', (data) => ws.send(data.toString()));
-  build.stderr.on('data', (data) => ws.send(data.toString()));
+//   build.stdout.on('data', (data) => ws.send(data.toString()));
+//   build.stderr.on('data', (data) => ws.send(data.toString()));
 
-  build.on('close', (code) => {
+
+    const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d','--build']);
+
+    run.stdout.on('data', (data) => ws.send(data.toString()));
+    run.stderr.on('data', (data) => ws.send(data.toString()));
+  run.on('close', (code) => {
     if (code !== 0) {
       ws.send(`❌ Build failed with exit code ${code}`);
       ws.close();
       return;
     }
 
-    const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
-
-    run.stdout.on('data', (data) => ws.send(data.toString()));
-    run.stderr.on('data', (data) => ws.send(data.toString()));
-
     run.on('close', () => {
-      ws.send(`Deployment successful!Assigning your subdomain...`);
+      ws.send(`Deployment successful!Assigning your subdomain...\n\n`);
 
       const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
       const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
