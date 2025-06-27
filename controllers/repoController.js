@@ -83,13 +83,17 @@ server {
         // Write config file
         //if already exists, overwrite it
         if (fs.existsSync(confPath)) {
-            fs.unlinkSync(confPath);
+        let existing = fs.readFileSync(confPath, 'utf8');
+        const updated = existing.replace(
+            /proxy_pass http:\/\/localhost:\d+;/,
+            `proxy_pass http://localhost:${port};`
+        );
+        fs.writeFileSync(confPath, updated);
+        fs.writeFileSync(enabledPath, updated);
         }
-        if (fs.existsSync(enabledPath)) {
-            fs.unlinkSync(enabledPath);
-        }
+        else{
         fs.writeFileSync(confPath, confContent);
-        fs.writeFileSync(enabledPath, confContent);
+        fs.writeFileSync(enabledPath, confContent);}
 
         // Reload NGINX
         try {
@@ -97,6 +101,8 @@ server {
             //check if we already have a cert for this subdomain
             const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/fullchain.pem`;
             if (fs.existsSync(certPath)) {
+                //if exists write it to the enabledPath with all certbot config
+                //and return
                 console.log(`✅ Certificate already exists for ${subdomainSafe}`);
                 return;
             }
