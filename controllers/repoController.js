@@ -71,7 +71,7 @@ export const handleContainerization = async (req, res) => {
 };
 
 export const handleDeploymentLogs = (req, res) => {
-    const { repo,subdomainSafe } = req.query;
+    const { repo,subdomainSafe,port } = req.query;
     if (!repo) return res.status(400).end('No repo in query');
 
     const repoName = repo.split('/').pop().replace('.git', '');
