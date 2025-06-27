@@ -1,16 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Detect Stack | Voomly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #334155;
+            color: #f1f5f9;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: 2px solid #38bdf8;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 16px;
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .error {
+            color: #f87171;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Enter GitHub Repository URL</h1>
-    <form action="/detect" method="POST">
-        <input type="text" name="githubUrl" placeholder="https://github.com/user/repo" required />
-        <button type="submit">Import</button>
-    </form>
-    <% if (typeof error !== 'undefined') { %>
-        <p style="color:red"><%= error %></p>
-    <% } %>
+    <div class="card">
+        <h1>Import a GitHub Repo</h1>
+        <form action="/detect" method="POST">
+            <input type="text" name="githubUrl" placeholder="https://github.com/user/repo" required />
+            <button type="submit">Import</button>
+        </form>
+        <% if (typeof error !== 'undefined') { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+    </div>
 </body>
 </html>

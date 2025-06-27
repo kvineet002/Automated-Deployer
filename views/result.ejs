@@ -1,49 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Deploy | Voomly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            background-color: #1e293b;
+            padding: 32px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: #334155;
+            color: #f1f5f9;
+            font-size: 16px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: 2px solid #38bdf8;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #38bdf8;
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0ea5e9;
+        }
+
+        .logs {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+
+        a {
+            color: #38bdf8;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .highlight {
+            color: #a5f3fc;
+        }
+    </style>
 </head>
 <body>
-    <h1>Detected Stack for:</h1>
-    <p><%= repo %></p>
-    <h2>→ <%= stack %></h2>
+    <div class="card">
+        <h1>🚀 Deploy | Voomly</h1>
+        <h2>Detected Stack for:</h2>
+        <p class="highlight"><%= repo %></p>
+        <h2>→ <%= stack %></h2>
 
-    <% if (stack === 'React') { %>
-        <% if (!startLogs) { %>
-            <!-- Show Deploy button if not started yet -->
-        <form action="/deploy" method="post">
-    <input type="hidden" name="repo" value="<%= repo %>">
-    <input type="hidden" name="stack" value="<%= stack %>">
-    <input type="hidden" name="port" value="<%= port %>">
-    <input type="text" name="subdomain" placeholder="Enter subdomain" required>
-    <button type="submit">🚀 Deploy This App</button>
-</form>
-
+        <% if (stack === 'React') { %>
+            <% if (!startLogs) { %>
+                <form action="/deploy" method="POST">
+                    <input type="hidden" name="repo" value="<%= repo %>">
+                    <input type="hidden" name="stack" value="<%= stack %>">
+                    <input type="hidden" name="port" value="<%= port %>">
+                    <input type="text" name="subdomain" placeholder="Enter subdomain (e.g., myapp)" required>
+                    <button type="submit">🚀 Deploy This App</button>
+                </form>
+            <% } %>
+        <% } else { %>
+            <p>❌ Deployment not supported for this stack yet.</p>
         <% } %>
-    <% } else { %>
-        <p>Deployment not supported for this stack yet.</p>
-    <% } %>
 
-    <% if (startLogs) { %>
-        <h1>🚀 Deployment Logs</h1>
-        <h1>Repo: <%= repo %></h1>
-        <h1>Stack: <%= stack %></h1>
-        <a href="https://<%= subdomain %>.voomly.xyz" target="_blank">https://<%= subdomain %>.voomly.xyz</a>
-        <pre id="logs">Streaming logs...
-</pre>
+        <% if (startLogs) { %>
+            <h2>Deployment Logs</h2>
+            <p><strong>Repo:</strong> <%= repo %></p>
+            <p><strong>Stack:</strong> <%= stack %></p>
+            <p><a href="https://<%= subdomain %>.voomly.xyz" target="_blank">🔗 https://<%= subdomain %>.voomly.xyz</a></p>
+            <div class="logs" id="logs">⏳ Streaming logs...</div>
+            <script>
+                const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
+                eventSource.onmessage = (e) => {
+                    document.getElementById('logs').textContent += e.data + "\n";
+                };
+                eventSource.onerror = () => {
+                    eventSource.close();
+                    document.getElementById('logs').textContent += '\n❌ Connection closed.';
+                };
+            </script>
+        <% } %>
 
-        <script>
-           const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
-            eventSource.onmessage = (e) => {
-                document.getElementById('logs').textContent += e.data + "\n";
-            };
-            eventSource.onerror = () => {
-                eventSource.close();
-                document.getElementById('logs').textContent += '\n❌ Connection closed.';
-            };
-        </script>
-    <% } %>
-
-    <br><a href="/">Check another repo</a>
+        <a href="/">← Check another repo</a>
+    </div>
 </body>
 </html>
