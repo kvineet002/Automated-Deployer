@@ -177,6 +177,7 @@
 
         .advanced-toggle {
             text-align: right;
+            align-items: baseline;
             margin-top: 8px;
             margin-bottom: 20px;
             background: transparent;
@@ -189,6 +190,8 @@
 
         .advanced-options {
             margin-top: 10px;
+            margin-bottom: 20px;
+
             padding: 16px;
             background-color: var(--bg-card);
             border-radius: 12px;
@@ -220,10 +223,11 @@
             font-size: 14px;
             outline: none;
         }
-
-        .advanced-toggle {
-            text-align: right;
-        }
+    svg{
+        transform: translateY(4px);
+        /* transform: translateX(-3px); */
+    }
+    
     </style>
 
 </head>
@@ -234,6 +238,8 @@
         <p><strong>How it works:</strong></p>
         <ul>
             <li>Paste a GitHub repo or pick from recent ones</li>
+            <li>Use advanced options to select a branch or subdirectory</li>
+            </li>
             <li>We auto-detect your stack</li>
             <li>Set a subdomain, hit deploy</li>
             <li>Get a live URL instantly</li>
@@ -247,7 +253,13 @@
         <form action="/import" method="POST">
             <input type="text" id="githubUrl" name="githubUrl" placeholder="https://github.com/user/repo" required />
 
-            <div type="button" class="advanced-toggle" onclick="toggleAdvanced()">Advanced Options ⬇</div>
+            <div type="button" class="advanced-toggle" onclick="toggleAdvanced()">
+                  <span>Advanced Options</span>
+<svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20" fill="currentColor">
+  <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+</svg>
+
+            </div>
 
             <!-- Hidden Advanced Section -->
             <div id="advancedSection" class="advanced-options" style="display: none;">
@@ -364,14 +376,18 @@
                     console.error(err);
                 }
             }
-            function toggleAdvanced() {
-                const section = document.getElementById('advancedSection');
-                const toggleBtn = document.querySelector('.advanced-toggle');
-                const isVisible = section.style.display === 'block';
+       function toggleAdvanced() {
+  const section = document.getElementById('advancedSection');
+  const icon = document.getElementById('toggleIcon');
+  const isVisible = section.style.display === 'block';
 
-                section.style.display = isVisible ? 'none' : 'block';
-                toggleBtn.innerHTML = isVisible ? 'Advanced Options ⬇' : 'Hide Advanced Options ⬆';
-            }
+  section.style.display = isVisible ? 'none' : 'block';
+
+  icon.innerHTML = isVisible
+    ? '<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'  // down arrow
+    : '<path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>'; // up arrow
+}
+
         </script>
 
 
