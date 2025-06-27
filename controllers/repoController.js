@@ -33,7 +33,8 @@ export const handleRepoSubmit = async (req, res) => {
     repo: githubUrl,
     stack,
     startLogs: false,
-    encodedRepo: encodeURIComponent(githubUrl)
+    encodedRepo: encodeURIComponent(githubUrl),
+    port
 });
 
     } catch (err) {
@@ -42,20 +43,61 @@ export const handleRepoSubmit = async (req, res) => {
     }
 };
 
-import { exec,spawn } from 'child_process';
+import { execSync,spawn } from 'child_process';
 
 export const handleContainerization = async (req, res) => {
-    const { repo, stack } = req.body;
-    if (!repo) return res.status(400).send('❌ No repo provided.');
+    const { repo, stack, subdomain,port } = req.body;
+    if (!repo || !subdomain) return res.status(400).send('❌ Repo and subdomain required.');
 
-    // Just render the same `deploy.ejs`, but now with `startLogs: true`
+    const subdomainSafe = subdomain.replace(/[^a-zA-Z0-9\-]/g, '');
+    const confPath = `/nginx/sites-available/${subdomainSafe}.conf`;
+    const enabledPath = `/nginx/sites-enabled/${subdomainSafe}.conf`;
+
+    // Render result.ejs with logs
     res.render('result', {
         repo,
         stack,
         startLogs: true,
-        encodedRepo:encodeURIComponent(repo),
+        port,
+        encodedRepo: encodeURIComponent(repo),
     });
+
+    // Delay a bit before running background steps
+    setTimeout(() => {
+        const confContent = `
+server {
+    listen 80;
+    server_name ${subdomainSafe}.voomly.xyz;
+
+    location / {
+        proxy_pass http://localhost:${port};  # Replace dynamically if needed
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+        `;
+
+        // Write config file
+        fs.writeFileSync(confPath, confContent);
+
+        // Create symlink if not exists
+        if (!fs.existsSync(enabledPath)) {
+            fs.symlinkSync(confPath, enabledPath);
+        }
+
+        // Reload NGINX
+        try {
+            execSync('nginx -s reload');
+            console.log(`✅ NGINX reloaded for ${subdomainSafe}`);
+        } catch (err) {
+            console.error('❌ Failed to reload NGINX:', err.message);
+        }
+    }, 4000); // Enough time for container to start
 };
+
 export const handleDeploymentLogs = (req, res) => {
     const { repo } = req.query;
     if (!repo) return res.status(400).end('No repo in query');

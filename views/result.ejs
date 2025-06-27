@@ -11,11 +11,14 @@
     <% if (stack === 'React') { %>
         <% if (!startLogs) { %>
             <!-- Show Deploy button if not started yet -->
-            <form action="/deploy" method="post">
-                <input type="hidden" name="repo" value="<%= repo %>">
-                <input type="hidden" name="stack" value="<%= stack %>">
-                <button type="submit">🚀 Deploy This App</button>
-            </form>
+        <form action="/deploy" method="post">
+    <input type="hidden" name="repo" value="<%= repo %>">
+    <input type="hidden" name="stack" value="<%= stack %>">
+    <input type="hidden" name="port" value="<%= port %>">
+    <input type="text" name="subdomain" placeholder="Enter subdomain" required>
+    <button type="submit">🚀 Deploy This App</button>
+</form>
+
         <% } %>
     <% } else { %>
         <p>Deployment not supported for this stack yet.</p>
