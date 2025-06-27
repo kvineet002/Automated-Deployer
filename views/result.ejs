@@ -92,11 +92,17 @@
         .highlight {
             color: #a5f3fc;
         }
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #f87171;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>🚀 Deploy | Voomly</h1>
+        <h1> Deploy | Voomly</h1>
         <h2>Detected Stack for:</h2>
         <p class="highlight"><%= repo %></p>
         <h2>→ <%= stack %></h2>
@@ -108,11 +114,11 @@
                     <input type="hidden" name="stack" value="<%= stack %>">
                     <input type="hidden" name="port" value="<%= port %>">
                     <input type="text" name="subdomain" placeholder="Enter subdomain (e.g., myapp)" required>
-                    <button type="submit">🚀 Deploy This App</button>
+                    <button type="submit"> Deploy This App</button>
                 </form>
             <% } %>
         <% } else { %>
-            <p>❌ Deployment not supported for this stack yet.</p>
+            <p> Deployment not supported for this stack yet.</p>
         <% } %>
 
         <% if (startLogs) { %>
@@ -120,6 +126,9 @@
             <p><strong>Repo:</strong> <%= repo %></p>
             <p><strong>Stack:</strong> <%= stack %></p>
             <p><a href="https://<%= subdomain %>.voomly.xyz" target="_blank">🔗 https://<%= subdomain %>.voomly.xyz</a></p>
+            <div class="message">
+                Wait for the full logs to finish loading. This may take a few some time.
+            </div>
             <div class="logs" id="logs">⏳ Streaming logs...</div>
             <script>
                 const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
@@ -128,7 +137,7 @@
                 };
                 eventSource.onerror = () => {
                     eventSource.close();
-                    document.getElementById('logs').textContent += '\n❌ Connection closed.';
+                    document.getElementById('logs').textContent += '\n All commands executed successfully.';
                 };
             </script>
         <% } %>
