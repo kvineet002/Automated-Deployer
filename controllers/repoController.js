@@ -115,7 +115,7 @@ export const handleDeploymentLogs = (ws, req) => {
   const repo = urlParams.get('repo');
   const subdomainSafe = urlParams.get('subdomainSafe');
   const port = urlParams.get('port');
-
+const subdirectory = urlParams.get('subdirectory') ;
   if (!repo || !subdomainSafe || !port) {
     ws.send('❌ Missing parameters');
     ws.close();
@@ -124,7 +124,6 @@ export const handleDeploymentLogs = (ws, req) => {
 
   const repoName = repo.split('/').pop().replace('.git', '');
   var tempPath = path.join('./cloned_repos', repoName);
-    const subdirectory = urlParams.get('subdirectory') || '';
      tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
     console.log(`Subdirectory: ${subdirectory}`);
      console.log(`Starting deployment for repo: ${repoName} at path: ${tempPath}`);
