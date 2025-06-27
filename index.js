@@ -3,12 +3,16 @@ import bodyParser from 'body-parser';
 import repoRoutes from './routes/repoRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import http from 'http';
+import https from 'https';
 import { WebSocketServer } from 'ws';
 import { spawn, execSync } from 'child_process';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const sslOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/voomly.xyz/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/voomly.xyz/fullchain.pem'),
+};
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,7 +24,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use('/', repoRoutes);
 
 // Create HTTP server
-const server = http.createServer(app);
+const server = https.createServer(sslOptions, app);
+
 
 // Attach WebSocket server
 const wss = new WebSocketServer({ server });
