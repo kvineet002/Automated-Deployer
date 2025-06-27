@@ -53,6 +53,10 @@ export const handleContainerization = async (req, res) => {
     const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
     const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
+    // Check if subdomain is already in use
+    if (fs.existsSync(enabledPath)) {
+        return res.status(400).send('❌ Subdomain already in use. Please choose another.');
+    }
     // Render result.ejs with logs
     res.render('result', {
         repo,
@@ -83,13 +87,7 @@ server {
         // Write config file
         //if already exists, overwrite it
         if (fs.existsSync(confPath)) {
-        let existing = fs.readFileSync(confPath, 'utf8');
-        const updated = existing.replace(
-            /proxy_pass http:\/\/localhost:\d+;/,
-            `proxy_pass http://localhost:${port};`
-        );
-        fs.writeFileSync(confPath, updated);
-        fs.writeFileSync(enabledPath, updated);
+
         }
         else{
         fs.writeFileSync(confPath, confContent);
@@ -98,14 +96,6 @@ server {
         // Reload NGINX
         try {
             execSync('sudo nginx -s reload');
-            //check if we already have a cert for this subdomain
-            const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/fullchain.pem`;
-            if (fs.existsSync(certPath)) {
-                //if exists write it to the enabledPath with all certbot config
-                //and return
-                console.log(`✅ Certificate already exists for ${subdomainSafe}`);
-                return;
-            }
             execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
             console.log(`✅ NGINX reloaded for ${subdomainSafe}`);
         } catch (err) {

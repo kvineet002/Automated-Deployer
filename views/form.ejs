@@ -7,7 +7,7 @@
     <h1>Enter GitHub Repository URL</h1>
     <form action="/detect" method="POST">
         <input type="text" name="githubUrl" placeholder="https://github.com/user/repo" required />
-        <button type="submit">Detect Stack</button>
+        <button type="submit">Import</button>
     </form>
     <% if (typeof error !== 'undefined') { %>
         <p style="color:red"><%= error %></p>

@@ -26,6 +26,9 @@
 
     <% if (startLogs) { %>
         <h1>🚀 Deployment Logs</h1>
+        <h1>Repo: <%= repo %></h1>
+        <h1>Stack: <%= stack %></h1>
+        <a href="https://<%= subdomain %>.voomly.xyz">https://<%= subdomain %>.voomly.xyz</a>
         <pre id="logs">Streaming logs...
 </pre>
 
