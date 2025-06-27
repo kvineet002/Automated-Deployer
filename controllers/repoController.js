@@ -80,7 +80,6 @@ export const handleContainerization = async (req, res) => {
 
 
 };
-
 export const handleDeploymentLogs = (ws, req) => {
   const urlParams = new URLSearchParams(req.url.replace('/?', ''));
   const repo = urlParams.get('repo');
@@ -99,38 +98,48 @@ export const handleDeploymentLogs = (ws, req) => {
 
   const build = spawn('docker', ['compose', '-f', composePath, 'build']);
 
-let currentStep = null;
-let stepStartTime = null;
 ws.send(`\n`)
+const output = execSync('curl -s http://ip-api.com/line/?fields=city,regionName,country');
+const location = output.toString().trim().split('\n').join(', ');
+ws.send(`🌍 Server location: ${location}\n`);
+const stepTimers = new Map();
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
     if (!line.trim()) return;
 
     const timestamp = new Date().toLocaleTimeString();
+    const stepStartMatch = line.match(/^#(\d+)\s+\[.*?\]/);
 
-    // Match start of a new step (e.g., "#1 [internal] load metadata...")
-    const stepStartMatch = line.match(/^#(\d+)\s+(.*)$/);
+    // Start of step
     if (stepStartMatch) {
-      currentStep = stepStartMatch[1];
-      stepStartTime = Date.now();
+      const stepId = stepStartMatch[1];
+      if (!stepTimers.has(stepId)) {
+        stepTimers.set(stepId, Date.now());
+      }
       ws.send(`[${timestamp}] ${line}`);
       return;
     }
 
-    // Match DONE lines like "#1 DONE 0.1s"
-    const doneMatch = line.match(/^#(\d+)\s+DONE\s+([0-9.]+)s$/);
-    if (doneMatch && doneMatch[1] === currentStep && stepStartTime) {
-      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2);
-      ws.send(`└── Took: ${elapsed}s\n`);
+    // DONE line
+    const doneMatch = line.match(/^#(\d+).*DONE\s+([0-9.]+)s$/);
+    if (doneMatch) {
+      const stepId = doneMatch[1];
+      const startTime = stepTimers.get(stepId);
+      if (startTime) {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+        ws.send(`[${timestamp}] ${line}`);
+        ws.send(`└── Took: ${elapsed}s\n`);
+      } else {
+        ws.send(`[${timestamp}] ${line}`);
+      }
       return;
     }
 
-    // For intermediate lines (like "transferring dockerfile...")
+    // Fallback
     ws.send(`[${timestamp}] ${line}`);
   });
 });
-
   build.stderr.on('data', (data) => ws.send(data.toString()));
 
   build.on('close', (code) => {
@@ -143,8 +152,6 @@ build.stdout.on('data', (data) => {
     const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
 
 const stepTimers = new Map();
-//print my linux server location
-ws.send(`\n`)
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
