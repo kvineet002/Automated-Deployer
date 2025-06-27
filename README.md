@@ -1,4 +1,4 @@
-# Voomy - One-Click App Deployer
+# Voomly - One-Click App Deployer
 You can access it here  **[https://voomly.xyz](https://voomly.xyz)**
 
 ##  What We Built
