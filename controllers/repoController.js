@@ -19,7 +19,7 @@ export const handleRepoSubmit = async (req, res) => {
     const tempPath = path.join('./cloned_repos', repoName);
 
     try {
-        // await cloneRepo(githubUrl, tempPath);
+        await cloneRepo(githubUrl, tempPath);
         const stack = detectStack(tempPath);
 
         const port = generatePORT();
@@ -58,7 +58,7 @@ export const handleContainerization = async (req, res) => {
     const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
     // Check if subdomain is already in use
-        if (!fs.existsSync(enabledPath)) {
+        if (fs.existsSync(enabledPath)) {
   return res.render('result', {
     repo,
     stack,
