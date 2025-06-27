@@ -115,7 +115,6 @@ export const handleDeploymentLogs = (req, res) => {
         '-f',
         composePath,
         'up',
-        '-d',
         '--build'
     ], {
   env: {
