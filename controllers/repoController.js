@@ -94,6 +94,12 @@ server {
         // Reload NGINX
         try {
             execSync('sudo nginx -s reload');
+            //check if we already have a cert for this subdomain
+            const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/fullchain.pem`;
+            if (fs.existsSync(certPath)) {
+                console.log(`✅ Certificate already exists for ${subdomainSafe}`);
+                return;
+            }
             execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
             console.log(`✅ NGINX reloaded for ${subdomainSafe}`);
         } catch (err) {
