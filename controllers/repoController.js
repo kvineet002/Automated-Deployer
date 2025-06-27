@@ -152,7 +152,7 @@ build.stdout.on('data', (data) => {
 
     const timestamp = new Date().toLocaleTimeString();
 
-    // Match start of a new step (e.g., "#1 [internal] load metadata...")
+    // Step start matcher
     const stepStartMatch = line.match(/^#(\d+)\s+(.*)$/);
     if (stepStartMatch) {
       currentStep = stepStartMatch[1];
@@ -161,23 +161,24 @@ build.stdout.on('data', (data) => {
       return;
     }
 
-    // Match DONE lines like "#1 DONE 0.1s"
-    const doneMatch = line.match(/^#(\d+)\s+DONE\s+([0-9.]+)s$/);
+    // DONE matcher (fix: more general)
+    const doneMatch = line.match(/^#(\d+).*DONE\s+([0-9.]+)s$/);
     if (doneMatch && doneMatch[1] === currentStep && stepStartTime) {
       const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2);
       ws.send(`└── Took: ${elapsed}s\n`);
       return;
     }
 
-    // For intermediate lines (like "transferring dockerfile...")
+    // Default log
     ws.send(`[${timestamp}] ${line}`);
   });
 });
 
+
     run.stderr.on('data', (data) => ws.send(data.toString()));
 
     run.on('close', () => {
-      ws.send(`Deployment successful!Assigning your subdomain...\n\n`);
+      ws.send(`Deployment successful!\nAssigning your subdomain...\n\n`);
 
       const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
       const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
