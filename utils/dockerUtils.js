@@ -6,7 +6,6 @@ const to_snakeCase = (str) => {
 }
 export const addDockerComposefile = (port, repoPath) => {
   const content = `
-version: '3'
 services:
   ${to_snakeCase(path.basename(repoPath))}:
     image: ${to_snakeCase(path.basename(repoPath))}_image
