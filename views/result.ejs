@@ -136,19 +136,34 @@
       color: var(--accent);
       text-decoration: none;
     }
-      .meta-info {
-    margin: 20px 0;
-  }
+    .meta-info {
+  background-color: #181818;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  font-size: 15px;
+}
 
-  .meta-info h2 {
-    margin-bottom: 5px;
-    font-size: 18px;
-    font-weight: 500;
-  }
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
 
-  .highlight strong {
-    font-weight: 600;
-  }
+.label {
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.value {
+  font-weight: 600;
+  color: var(--text-light);
+  word-break: break-word;
+  text-align: right;
+}
+
 
   </style>
 </head>
@@ -156,13 +171,17 @@
   <div class="container">
     <div class="card">
       <h1> Deploy | Voomly</h1>
-      <div class="meta-info">
-  <h2>Detected Stack:</h2>
-  <p class="highlight"><strong><%= stack %></strong></p>
-
-  <h2>GitHub Repository:</h2>
-  <p class="highlight"><%= repo %></p>
+ <div class="meta-info">
+  <div class="info-row">
+    <span class="label">Detected Stack:</span>
+    <span class="value"><%= stack %></span>
+  </div>
+  <div class="info-row">
+    <span class="label">GitHub Repo:</span>
+    <span class="value"><%= repo %></span>
+  </div>
 </div>
+
 
       <% if (stack === 'React') { %>
         <% if (!startLogs) { %>
