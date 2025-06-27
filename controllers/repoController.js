@@ -80,6 +80,7 @@ import { execSync,spawn } from 'child_process';
 export const handleContainerization = async (req, res) => {
     const { repo, stack, subdomain,port,subdirectory } = req.body;
     if (!repo || !subdomain) return res.status(400).send('❌ Repo and subdomain required.');
+    console.log(`Received repo: ${repo}, stack: ${stack}, subdomain: ${subdomain}, port: ${port}, subdirectory: ${subdirectory}`);
 
     const subdomainSafe = subdomain.replace(/[^a-zA-Z0-9\-]/g, '');
     const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
