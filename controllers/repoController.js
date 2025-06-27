@@ -65,7 +65,7 @@ export const handleRepoSubmit = async (req, res) => {
             startLogs: false,
             encodedRepo: encodeURIComponent(githubUrl),
             port,
-            subdirectory
+            subdirectory:subdirectory
         });
 
     } catch (err) {
@@ -94,7 +94,7 @@ export const handleContainerization = async (req, res) => {
     subdomain: subdomainSafe,
     port,
     encodedRepo: encodeURIComponent(repo),
-    subdirectory,
+    subdirectory:subdirectory,
     error: 'Subdomain already in use. Please choose another.'
   });    }
     // Render result.ejs with logs
@@ -104,7 +104,7 @@ export const handleContainerization = async (req, res) => {
         startLogs: true,
         subdomain: subdomainSafe,
         port,
-        subdirectory,
+        subdirectory:subdirectory,
         encodedRepo: encodeURIComponent(repo),
     });
 
