@@ -62,6 +62,7 @@ export const handleContainerization = async (req, res) => {
         repo,
         stack,
         startLogs: true,
+        subdomain: subdomainSafe,
         port,
         encodedRepo: encodeURIComponent(repo),
     });
