@@ -50,8 +50,8 @@ export const handleContainerization = async (req, res) => {
     if (!repo || !subdomain) return res.status(400).send('❌ Repo and subdomain required.');
 
     const subdomainSafe = subdomain.replace(/[^a-zA-Z0-9\-]/g, '');
-    const confPath = `/nginx/sites-available/${subdomainSafe}.conf`;
-    const enabledPath = `/nginx/sites-enabled/${subdomainSafe}.conf`;
+    const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+    const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
     // Render result.ejs with logs
     res.render('result', {
@@ -86,7 +86,8 @@ server {
 
         // Reload NGINX
         try {
-            execSync('nginx -s reload');
+            execSync('sudo nginx -s reload');
+            execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
             console.log(`✅ NGINX reloaded for ${subdomainSafe}`);
         } catch (err) {
             console.error('❌ Failed to reload NGINX:', err.message);
@@ -114,7 +115,6 @@ export const handleDeploymentLogs = (req, res) => {
         '-f',
         composePath,
         'up',
-        '-d', 
         '--build'
     ], {
         env: {
