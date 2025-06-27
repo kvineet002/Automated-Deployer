@@ -284,10 +284,10 @@
                                                 <% } %>
 
 
-                                            
+                                                    <div class="logs" id="logs"></div>
                                           <script>
   const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>`);
-document.getElementById('logs').textContent = '⏳ Streaming logs...\n';
+
   socket.onmessage = (event) => {
     const logsEl = document.getElementById('logs');
     const data = event.data;
