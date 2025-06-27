@@ -42,7 +42,7 @@ export const handleRepoSubmit = async (req, res) => {
         const branch = userBranch || await getDefaultBranch(owner, repo);
 
         // Clone the selected or default branch
-        // await cloneRepo(githubUrl, tempPath, branch);
+        await cloneRepo(githubUrl, tempPath, branch);
 
         // Adjust for subdirectory (if any)
         const finalPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
