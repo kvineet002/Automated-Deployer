@@ -1,159 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Detect Stack | Voomly</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg-dark: #121212;
-      --bg-card: #1c1c1c;
-      --text-light: #e5e5e5;
-      --accent: #4ade80;
-      --accent-hover: #22c55e;
-      --input-bg: #2a2a2a;
-      --border: #333;
-      --error: #f87171;
-    }
+    <meta charset="UTF-8" />
+    <title>Detect Stack | Voomly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1c1c1c;
+            --text-light: #e5e5e5;
+            --accent: #4ade80;
+            --accent-hover: #22c55e;
+            --input-bg: #2a2a2a;
+            --border: #333;
+            --error: #f87171;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-light);
-      display: flex;
-        flex-direction: column-reverse;
-        
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column-reverse;
 
-    .card {
-      background-color: var(--bg-card);
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      width: 100%;
-      max-width: 500px;
-      border: 1px solid var(--border);
-    }
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-weight: 600;
-    }
+        .card {
+            background-color: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+        }
 
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--text-light);
-      font-size: 16px;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-    }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
 
-    input[type="text"]:focus {
-      outline: 2px solid var(--accent);
-    }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
 
-    button {
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--accent);
-      color: var(--bg-dark);
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+        input[type="text"]:focus {
+            outline: 2px solid var(--accent);
+        }
 
-    button:hover {
-      background: var(--accent-hover);
-    }
+        button {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
 
-    .error {
-      color: var(--error);
-      margin-top: 15px;
-      text-align: center;
-      font-size: 14px;
-    }
-    .logo {
-      width: 150px;
-    }
-    .about-card {
-       background-color: var(--bg-card);
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      width: 100%;
-      max-width: 540px;
-      border: 1px solid var(--border);
-        margin-top: 20px;
-    }
-   .about-card {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  padding: 20px 24px;
-  border-radius: 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #d4d4d4;
-  margin-bottom: 24px;
-  box-shadow: 0 0 0 1px #2a2a2a inset, 0 6px 20px rgba(0, 0, 0, 0.4);
-}
+        button:hover {
+            background: var(--accent-hover);
+        }
 
-.about-card p {
-  margin: 0 0 10px;
-  font-weight: 500;
-  color: #f4f4f5;
-}
+        .error {
+            color: var(--error);
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
 
-.about-card ul {
-  list-style: disc inside;
-  padding: 0;
-  margin: 0;
-}
+        .logo {
+            width: 150px;
+        }
 
-.about-card li {
-  margin-bottom: 6px;
-}
+        .about-card {
+            background-color: var(--bg-card);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 540px;
+            border: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        .about-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 20px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            margin-bottom: 24px;
+            box-shadow: 0 0 0 1px #2a2a2a inset, 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .about-card p {
+            margin: 0 0 10px;
+            font-weight: 500;
+            color: #f4f4f5;
+        }
+
+        .about-card ul {
+            list-style: disc inside;
+            padding: 0;
+            margin: 0;
+        }
+
+        .about-card li {
+            margin-bottom: 6px;
+        }
+
+        .directory-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .directory-label {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            color: #d4d4d4;
+        }
+
+        .directory-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .directory-input-group select {
+            flex: 3;
+            /* 3 parts */
+            padding: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .choose-directory-button {
+            flex: 1;
+            /* 1 part */
+            padding: 12px 0;
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
 
 
-  </style>
+        .advanced-toggle {
+            text-align: right;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .advanced-options {
+            margin-top: 10px;
+            padding: 16px;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .advanced-options input,
+        .advanced-options select {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .advanced-toggle {
+            text-align: right;
+        }
+    </style>
 
 </head>
+
 <body>
 
-<div class="about-card">
-  <p><strong>How it works:</strong></p>
-  <ul>
-    <li>Paste a GitHub repo or pick from recent ones</li>
-    <li>We auto-detect your stack</li>
-    <li>Set a subdomain, hit deploy</li>
-    <li>Get a live URL instantly</li>
-  </ul>
-</div>
+    <div class="about-card">
+        <p><strong>How it works:</strong></p>
+        <ul>
+            <li>Paste a GitHub repo or pick from recent ones</li>
+            <li>We auto-detect your stack</li>
+            <li>Set a subdomain, hit deploy</li>
+            <li>Get a live URL instantly</li>
+        </ul>
+    </div>
 
 
-  <div class="card">
-           <img src="/assets/logo.png" alt="Voomly Logo" class="logo" />
+    <div class="card">
+        <img src="/assets/logo.png" alt="Voomly Logo" class="logo" />
 
-    <form action="/import" method="POST">
-      <input type="text" name="githubUrl" placeholder="https://github.com/user/repo" required />
-      <button type="submit">Import</button>
-    </form>
-    <% if (typeof error !== 'undefined') { %>
-      <p class="error"><%= error %></p>
-    <% } %>
-  </div>
+        <form action="/import" method="POST">
+            <input type="text" id="githubUrl" name="githubUrl" placeholder="https://github.com/user/repo" required />
+
+            <div type="button" class="advanced-toggle" onclick="toggleAdvanced()">Advanced Options ⬇</div>
+
+            <!-- Hidden Advanced Section -->
+            <div id="advancedSection" class="advanced-options" style="display: none;">
+                <!-- Branch Input -->
+                <select onfocus="loadBranchesOnce()" id="branch" name="branch" style="margin-top: 10px;">
+                    <option value="">Select branch</option>
+                </select>
+
+                <!-- Directory Selection -->
+                <div class="directory-input-group">
+                    <select id="subdirectory" name="subdirectory" onfocus="loadFoldersOnce()">
+                        <option value="">Choose subdirectory (optional)</option>
+                    </select>
+
+                </div>
+            </div>
+            <button type="submit">Import</button>
+        </form>
+        <script>
+            let branchesLoaded = false;
+            let selectedBranch = "";
+
+            async function loadBranchesOnce() {
+                if (branchesLoaded) return; // Prevent reload
+                await loadBranches();
+                branchesLoaded = true;
+            }
+
+            async function loadBranches() {
+                const repoUrl = document.getElementById('githubUrl').value.trim();
+                const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)(\.git)?$/);
+                if (!repoUrl || !match) {
+                    alert('Invalid GitHub URL');
+                    return;
+                }
+
+                const owner = match[1];
+                const repo = match[2];
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/branches`;
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
+                    const data = await response.json();
+
+                    const branchSelect = document.getElementById('branch');
+                    branchSelect.innerHTML = '<option value="">Select branch</option>';
+
+                    data.forEach(branch => {
+                        const option = document.createElement('option');
+                        option.value = branch.name;
+                        option.textContent = branch.name;
+                        branchSelect.appendChild(option);
+                    });
+
+                    // Set listener for branch selection
+                    branchSelect.onchange = (e) => {
+                        selectedBranch = e.target.value;
+                        document.getElementById('subdirectory').innerHTML = '<option value="">Choose subdirectory (optional)</option>'; // Reset folders
+                    };
+
+                } catch (err) {
+                    alert('❌ Failed to fetch branches.');
+                    console.error(err);
+                }
+            }
+
+            let foldersLoadedFor = ""; // Track if folders were already loaded for a specific branch+repo
+
+            async function loadFoldersOnce() {
+                const repoUrl = document.getElementById('githubUrl').value.trim();
+                const selectedBranch = document.getElementById('branch').value.trim() || "main";
+                const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)(\.git)?$/);
+                if (!repoUrl || !match) {
+                    alert("Invalid GitHub URL");
+                    return;
+                }
+
+                const key = `${repoUrl}@${selectedBranch}`;
+                if (foldersLoadedFor === key) return; // Already loaded for this branch/repo combo
+
+                const owner = match[1];
+                const repo = match[2];
+
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${selectedBranch}?recursive=1`;
+
+                try {
+                    const res = await fetch(apiUrl);
+                    const data = await res.json();
+
+                    if (!data.tree) {
+                        alert("No data found. Check if the branch exists.");
+                        return;
+                    }
+
+                    const folders = [...new Set(
+                        data.tree
+                            .filter(item => item.type === "tree")
+                            .map(item => item.path)
+                    )];
+
+                    const dropdown = document.getElementById("subdirectory");
+                    dropdown.innerHTML = '<option value="">Root</option>';
+                    folders.forEach(folder => {
+                        const option = document.createElement("option");
+                        option.value = folder;
+                        option.textContent = folder;
+                        dropdown.appendChild(option);
+                    });
+
+                    foldersLoadedFor = key;
+                } catch (err) {
+                    alert("❌ Failed to fetch folders. Check the repo and branch.");
+                    console.error(err);
+                }
+            }
+            function toggleAdvanced() {
+                const section = document.getElementById('advancedSection');
+                const toggleBtn = document.querySelector('.advanced-toggle');
+                const isVisible = section.style.display === 'block';
+
+                section.style.display = isVisible ? 'none' : 'block';
+                toggleBtn.innerHTML = isVisible ? 'Advanced Options ⬇' : 'Hide Advanced Options ⬆';
+            }
+        </script>
+
+
+        <% if (typeof error !=='undefined' ) { %>
+            <p class="error">
+                <%= error %>
+            </p>
+            <% } %>
+    </div>
 </body>
+
 </html>

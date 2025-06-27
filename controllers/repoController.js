@@ -11,46 +11,74 @@ const generatePORT = () => {
     return Math.floor(1000 + Math.random() * 9000);
 }
 
+import fetch from 'node-fetch';
+
+const getDefaultBranch = async (owner, repo) => {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+    const data = await res.json();
+    return data.default_branch || 'main';
+};
+
 export const handleRepoSubmit = async (req, res) => {
-    const { githubUrl } = req.body;
-    if (!githubUrl) return res.render('form', { error: 'GitHub URL is required' });
+    const { githubUrl, branch: userBranch, subdirectory = '' } = req.body;
+
+    if (!githubUrl) {
+        return res.render('form', { error: 'GitHub URL is required' });
+    }
 
     const repoName = githubUrl.split('/').pop().replace('.git', '');
     const tempPath = path.join('./cloned_repos', repoName);
 
-    try {
-        await cloneRepo(githubUrl, tempPath);
-        const stack = detectStack(tempPath);
+    // Extract owner and repo from URL
+    const match = githubUrl.match(/github\.com\/([^\/]+)\/([^\/]+)(\.git)?$/);
+    if (!match) {
+        return res.render('form', { error: 'Invalid GitHub URL format' });
+    }
+    const owner = match[1];
+    const repo = match[2];
 
+    try {
+        const branch = userBranch || await getDefaultBranch(owner, repo);
+
+        // Clone the selected or default branch
+        // await cloneRepo(githubUrl, tempPath, branch);
+
+        // Adjust for subdirectory (if any)
+        const finalPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
+        console.log(`Cloned repo to: ${finalPath}`);
+        const stack = detectStack(finalPath);
         const port = generatePORT();
-        if(stack==='Vite') {
-            //we dont have a facility to deploy vite apps yet
+
+        if (stack === 'Vite') {
             return res.render('form', { error: 'Vite apps are not supported yet.' });
         }
+
         if (stack === 'React') {
-            addDockerfile(tempPath);
-            addDockerComposefile(port, tempPath);
+            addDockerfile(finalPath);
+            addDockerComposefile(port, finalPath);
         }
-        
-        // Show deploy page with button, but no logs yet
-       res.render('result', {
-    repo: githubUrl,
-    stack,
-    startLogs: false,
-    encodedRepo: encodeURIComponent(githubUrl),
-    port
-});
+
+        res.render('result', {
+            repo: githubUrl,
+            stack,
+            startLogs: false,
+            encodedRepo: encodeURIComponent(githubUrl),
+            port,
+            subdirectory
+        });
 
     } catch (err) {
         console.error(err);
-        res.render('form', { error: 'Failed to detect stack.' });
+        res.render('form', { error: 'Failed to detect stack or clone repo.' });
     }
 };
+
 
 import { execSync,spawn } from 'child_process';
 
 export const handleContainerization = async (req, res) => {
-    const { repo, stack, subdomain,port } = req.body;
+    const { repo, stack, subdomain,port,subdirectory } = req.body;
     if (!repo || !subdomain) return res.status(400).send('❌ Repo and subdomain required.');
 
     const subdomainSafe = subdomain.replace(/[^a-zA-Z0-9\-]/g, '');
@@ -66,6 +94,7 @@ export const handleContainerization = async (req, res) => {
     subdomain: subdomainSafe,
     port,
     encodedRepo: encodeURIComponent(repo),
+    subdirectory,
     error: 'Subdomain already in use. Please choose another.'
   });    }
     // Render result.ejs with logs
@@ -75,6 +104,7 @@ export const handleContainerization = async (req, res) => {
         startLogs: true,
         subdomain: subdomainSafe,
         port,
+        subdirectory,
         encodedRepo: encodeURIComponent(repo),
     });
 
@@ -93,7 +123,9 @@ export const handleDeploymentLogs = (ws, req) => {
   }
 
   const repoName = repo.split('/').pop().replace('.git', '');
-  const tempPath = path.join('./cloned_repos', repoName);
+  var tempPath = path.join('./cloned_repos', repoName);
+    const subdirectory = urlParams.get('subdirectory') || '';
+     tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
   const composePath = path.join(tempPath, 'docker-compose.yml');
 
   const build = spawn('docker', ['compose', '-f', composePath, 'build']);
