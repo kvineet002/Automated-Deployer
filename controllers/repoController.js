@@ -126,6 +126,8 @@ export const handleDeploymentLogs = (ws, req) => {
   var tempPath = path.join('./cloned_repos', repoName);
     const subdirectory = urlParams.get('subdirectory') || '';
      tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
+    console.log(`Subdirectory: ${subdirectory}`);
+     console.log(`Starting deployment for repo: ${repoName} at path: ${tempPath}`);
   const composePath = path.join(tempPath, 'docker-compose.yml');
 
   const build = spawn('docker', ['compose', '-f', composePath, 'build']);
