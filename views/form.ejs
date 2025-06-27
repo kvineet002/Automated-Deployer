@@ -21,6 +21,8 @@
       background: var(--bg-dark);
       color: var(--text-light);
       display: flex;
+        flex-direction: column-reverse;
+        
       justify-content: center;
       align-items: center;
       height: 100vh;
@@ -84,12 +86,68 @@
       text-align: center;
       font-size: 14px;
     }
+    .logo {
+      width: 150px;
+    }
+    .about-card {
+       background-color: var(--bg-card);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 540px;
+      border: 1px solid var(--border);
+        margin-top: 20px;
+    }
+   .about-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  padding: 20px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #d4d4d4;
+  margin-bottom: 24px;
+  box-shadow: 0 0 0 1px #2a2a2a inset, 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.about-card p {
+  margin: 0 0 10px;
+  font-weight: 500;
+  color: #f4f4f5;
+}
+
+.about-card ul {
+  list-style: disc inside;
+  padding: 0;
+  margin: 0;
+}
+
+.about-card li {
+  margin-bottom: 6px;
+}
+
+
   </style>
+
 </head>
 <body>
+
+<div class="about-card">
+  <p><strong>How it works:</strong></p>
+  <ul>
+    <li>Paste a GitHub repo or pick from recent ones</li>
+    <li>We auto-detect your stack</li>
+    <li>Set a subdomain, hit deploy</li>
+    <li>Get a live URL instantly</li>
+  </ul>
+</div>
+
+
   <div class="card">
-    <h1> Import a GitHub Repo</h1>
-    <form action="/detect" method="POST">
+           <img src="/assets/logo.png" alt="Voomly Logo" class="logo" />
+
+    <form action="/import" method="POST">
       <input type="text" name="githubUrl" placeholder="https://github.com/user/repo" required />
       <button type="submit">Import</button>
     </form>

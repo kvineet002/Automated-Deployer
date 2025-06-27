@@ -3,7 +3,11 @@ import path from 'path';
 
 export const detectStack = (repoPath) => {
     const exists = (file) => fs.existsSync(path.join(repoPath, file));
-
+    //detect vite+react
+    if (exists('vite.config.js') && exists('package.json')) {
+        const pkg = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json')));
+        if (pkg.dependencies?.react) return 'Vite';
+    }
     if (exists('package.json')) {
         const pkg = JSON.parse(fs.readFileSync(path.join(repoPath, 'package.json')));
         if (pkg.dependencies?.next) return 'Next.js';

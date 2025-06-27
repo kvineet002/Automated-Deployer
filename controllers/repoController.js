@@ -19,15 +19,19 @@ export const handleRepoSubmit = async (req, res) => {
     const tempPath = path.join('./cloned_repos', repoName);
 
     try {
-        await cloneRepo(githubUrl, tempPath);
+        // await cloneRepo(githubUrl, tempPath);
         const stack = detectStack(tempPath);
 
         const port = generatePORT();
+        if(stack==='Vite') {
+            //we dont have a facility to deploy vite apps yet
+            return res.render('form', { error: 'Vite apps are not supported yet.' });
+        }
         if (stack === 'React') {
             addDockerfile(tempPath);
             addDockerComposefile(port, tempPath);
         }
-
+        
         // Show deploy page with button, but no logs yet
        res.render('result', {
     repo: githubUrl,
@@ -39,7 +43,7 @@ export const handleRepoSubmit = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.render('form', { error: '❌ Failed to detect stack.' });
+        res.render('form', { error: 'Failed to detect stack.' });
     }
 };
 
@@ -54,9 +58,16 @@ export const handleContainerization = async (req, res) => {
     const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
     // Check if subdomain is already in use
-    if (fs.existsSync(enabledPath)) {
-        return res.status(400).send('❌ Subdomain already in use. Please choose another.');
-    }
+        if (!fs.existsSync(enabledPath)) {
+  return res.render('result', {
+    repo,
+    stack,
+    startLogs: false,
+    subdomain: subdomainSafe,
+    port,
+    encodedRepo: encodeURIComponent(repo),
+    error: 'Subdomain already in use. Please choose another.'
+  });    }
     // Render result.ejs with logs
     res.render('result', {
         repo,

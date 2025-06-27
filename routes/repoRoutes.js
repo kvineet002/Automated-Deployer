@@ -4,7 +4,7 @@ import { showForm, handleRepoSubmit, handleContainerization, handleDeploymentLog
 const router = express.Router();
 
 router.get('/', showForm);
-router.post('/detect', handleRepoSubmit);
+router.post('/import', handleRepoSubmit);
 router.post('/deploy', handleContainerization   );
 router.get('/deploy-stream', handleDeploymentLogs);
 export default router;
