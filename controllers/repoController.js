@@ -97,22 +97,84 @@ export const handleDeploymentLogs = (ws, req) => {
   const tempPath = path.join('./cloned_repos', repoName);
   const composePath = path.join(tempPath, 'docker-compose.yml');
 
-//   const build = spawn('docker', ['compose', '-f', composePath, 'build']);
+  const build = spawn('docker', ['compose', '-f', composePath, 'build']);
 
-//   build.stdout.on('data', (data) => ws.send(data.toString()));
-//   build.stderr.on('data', (data) => ws.send(data.toString()));
+let currentStep = null;
+let stepStartTime = null;
 
+build.stdout.on('data', (data) => {
+  const lines = data.toString().split('\n');
+  lines.forEach((line) => {
+    if (!line.trim()) return;
 
-    const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d','--build']);
+    const timestamp = new Date().toLocaleTimeString();
 
-    run.stdout.on('data', (data) => ws.send(data.toString()));
-    run.stderr.on('data', (data) => ws.send(data.toString()));
-  run.on('close', (code) => {
+    // Match start of a new step (e.g., "#1 [internal] load metadata...")
+    const stepStartMatch = line.match(/^#(\d+)\s+(.*)$/);
+    if (stepStartMatch) {
+      currentStep = stepStartMatch[1];
+      stepStartTime = Date.now();
+      ws.send(`[${timestamp}] ${line}`);
+      return;
+    }
+
+    // Match DONE lines like "#1 DONE 0.1s"
+    const doneMatch = line.match(/^#(\d+)\s+DONE\s+([0-9.]+)s$/);
+    if (doneMatch && doneMatch[1] === currentStep && stepStartTime) {
+      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2);
+      ws.send(`└── Took: ${elapsed}s\n`);
+      return;
+    }
+
+    // For intermediate lines (like "transferring dockerfile...")
+    ws.send(`[${timestamp}] ${line}`);
+  });
+});
+
+  build.stderr.on('data', (data) => ws.send(data.toString()));
+
+  build.on('close', (code) => {
     if (code !== 0) {
       ws.send(`❌ Build failed with exit code ${code}`);
       ws.close();
       return;
     }
+
+    const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
+
+let currentStep = null;
+let stepStartTime = null;
+
+build.stdout.on('data', (data) => {
+  const lines = data.toString().split('\n');
+  lines.forEach((line) => {
+    if (!line.trim()) return;
+
+    const timestamp = new Date().toLocaleTimeString();
+
+    // Match start of a new step (e.g., "#1 [internal] load metadata...")
+    const stepStartMatch = line.match(/^#(\d+)\s+(.*)$/);
+    if (stepStartMatch) {
+      currentStep = stepStartMatch[1];
+      stepStartTime = Date.now();
+      ws.send(`[${timestamp}] ${line}`);
+      return;
+    }
+
+    // Match DONE lines like "#1 DONE 0.1s"
+    const doneMatch = line.match(/^#(\d+)\s+DONE\s+([0-9.]+)s$/);
+    if (doneMatch && doneMatch[1] === currentStep && stepStartTime) {
+      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2);
+      ws.send(`└── Took: ${elapsed}s\n`);
+      return;
+    }
+
+    // For intermediate lines (like "transferring dockerfile...")
+    ws.send(`[${timestamp}] ${line}`);
+  });
+});
+
+    run.stderr.on('data', (data) => ws.send(data.toString()));
 
     run.on('close', () => {
       ws.send(`Deployment successful!Assigning your subdomain...\n\n`);
