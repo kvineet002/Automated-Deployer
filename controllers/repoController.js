@@ -118,8 +118,7 @@ export const handleDeploymentLogs = (req, res) => {
         '--build'
     ], {
   env: {
-    ...process.env,
-    DOCKER_BUILDKIT: '0'
+    ...process.env
   }
     });
 
