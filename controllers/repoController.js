@@ -142,8 +142,7 @@ build.stdout.on('data', (data) => {
 
     const run = spawn('docker', ['compose', '-f', composePath, 'up', '-d']);
 
-let currentStep = null;
-let stepStartTime = null;
+const stepTimers = new Map();
 
 build.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
@@ -151,28 +150,38 @@ build.stdout.on('data', (data) => {
     if (!line.trim()) return;
 
     const timestamp = new Date().toLocaleTimeString();
+    const stepStartMatch = line.match(/^#(\d+)\s+\[.*?\]/);
 
-    // Step start matcher
-    const stepStartMatch = line.match(/^#(\d+)\s+(.*)$/);
+    // Start of step
     if (stepStartMatch) {
-      currentStep = stepStartMatch[1];
-      stepStartTime = Date.now();
+      const stepId = stepStartMatch[1];
+      if (!stepTimers.has(stepId)) {
+        stepTimers.set(stepId, Date.now());
+      }
       ws.send(`[${timestamp}] ${line}`);
       return;
     }
 
-    // DONE matcher (fix: more general)
+    // DONE line
     const doneMatch = line.match(/^#(\d+).*DONE\s+([0-9.]+)s$/);
-    if (doneMatch && doneMatch[1] === currentStep && stepStartTime) {
-      const elapsed = ((Date.now() - stepStartTime) / 1000).toFixed(2);
-      ws.send(`└── Took: ${elapsed}s\n`);
+    if (doneMatch) {
+      const stepId = doneMatch[1];
+      const startTime = stepTimers.get(stepId);
+      if (startTime) {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+        ws.send(`[${timestamp}] ${line}`);
+        ws.send(`└── Took: ${elapsed}s\n`);
+      } else {
+        ws.send(`[${timestamp}] ${line}`);
+      }
       return;
     }
 
-    // Default log
+    // Fallback
     ws.send(`[${timestamp}] ${line}`);
   });
 });
+
 
 
     run.stderr.on('data', (data) => ws.send(data.toString()));
