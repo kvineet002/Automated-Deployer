@@ -67,46 +67,11 @@ export const handleContainerization = async (req, res) => {
         encodedRepo: encodeURIComponent(repo),
     });
 
-    // Delay a bit before running background steps
-    setTimeout(() => {
-        const confContent = `
-server {
-    listen 80;
-    server_name ${subdomainSafe}.voomly.xyz;
 
-    location / {
-        proxy_pass http://localhost:${port};  # Replace dynamically if needed
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-        `;
-
-        // Write config file
-        //if already exists, overwrite it
-        if (fs.existsSync(confPath)) {
-
-        }
-        else{
-        fs.writeFileSync(confPath, confContent);
-        fs.writeFileSync(enabledPath, confContent);}
-
-        // Reload NGINX
-        try {
-            execSync('sudo nginx -s reload');
-            execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
-            console.log(`✅ NGINX reloaded for ${subdomainSafe}`);
-        } catch (err) {
-            console.error('❌ Failed to reload NGINX:', err.message);
-        }
-    }, 4000); // Enough time for container to start
 };
 
 export const handleDeploymentLogs = (req, res) => {
-    const { repo } = req.query;
+    const { repo,subdomainSafe } = req.query;
     if (!repo) return res.status(400).end('No repo in query');
 
     const repoName = repo.split('/').pop().replace('.git', '');
@@ -176,10 +141,46 @@ build.on('close', (code) => {
         });
     });
 
-    run.on('close', (runCode) => {
-        res.write(`data: ✅ Deployment finished with exit code ${runCode}\n\n`);
-        res.end();
-    });
+  run.on('close', (runCode) => {
+    res.write(`data: ✅ Deployment finished with exit code ${runCode}\n\n`);
+    const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+    const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+    // Now that the container is up, configure NGINX
+    const confContent = `
+server {
+    listen 80;
+    server_name ${subdomainSafe}.voomly.xyz;
+
+    location / {
+        proxy_pass http://localhost:${port};  # Replace dynamically if needed
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+    `;
+
+    try {
+        // Write or overwrite config
+        fs.writeFileSync(confPath, confContent);
+        fs.writeFileSync(enabledPath, confContent);
+
+        // Reload NGINX
+        execSync('sudo nginx -s reload');
+
+        // Run certbot
+        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+        res.write(`data: ✅ NGINX configured for ${subdomainSafe}.voomly.xyz\n\n`);
+    } catch (err) {
+        console.error('❌ Failed to configure NGINX:', err.message);
+        res.write(`data: ❌ Failed to configure NGINX: ${err.message}\n\n`);
+    }
+
+    res.end();
+});
+
 });
 
 };

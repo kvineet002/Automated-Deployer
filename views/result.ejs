@@ -33,7 +33,7 @@
 </pre>
 
         <script>
-           const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>');
+           const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>');
             eventSource.onmessage = (e) => {
                 document.getElementById('logs').textContent += e.data + "\n";
             };
