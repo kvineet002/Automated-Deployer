@@ -285,28 +285,31 @@
 
 
                                                     <div class="logs" id="logs">⏳ Streaming logs...</div>
-                                                    <script>
+                                          <script>
+  const socket = new WebSocket(`ws://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>`);
 
-                                                        const eventSource = new EventSource('/deploy-stream?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>');
+  socket.onmessage = (event) => {
+    const logsEl = document.getElementById('logs');
+    const data = event.data;
 
-                                                        eventSource.onmessage = (e) => {
-                                                            document.getElementById('logs').textContent += e.data + "\n";
-                                                        };
+    if (data.startsWith('nginx-ready:')) {
+      const url = `https://${data.split(':')[1]}`;
+      const anchor = document.getElementById('site-anchor');
+      anchor.href = url;
+      anchor.textContent = `🔗 ${url}`;
+      document.getElementById('site-link').style.display = 'block';
+    } else {
+      logsEl.textContent += data + '\n';
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
+  };
 
-                                                        eventSource.addEventListener('nginx-ready', function (e) {
-                                                            const url = `https://${e.data}`;
-                                                            const link = document.getElementById('site-anchor');
-                                                            link.href = url;
-                                                            link.textContent = `🔗 ${url}`;
-                                                            document.getElementById('site-link').style.display = 'block';
-                                                        });
+  socket.onerror = () => {
+    const logsEl = document.getElementById('logs');
+    logsEl.textContent += '\n⚠️ WebSocket connection closed.';
+  };
+</script>
 
-                                                        eventSource.onerror = () => {
-                                                            eventSource.close();
-                                                            document.getElementById('logs').textContent += '\n All commands executed successfully.';
-                                                        };
-
-                                                    </script>
 
                                                     <% } %>
 
