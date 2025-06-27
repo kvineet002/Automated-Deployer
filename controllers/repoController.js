@@ -81,6 +81,13 @@ server {
         `;
 
         // Write config file
+        //if already exists, overwrite it
+        if (fs.existsSync(confPath)) {
+            fs.unlinkSync(confPath);
+        }
+        if (fs.existsSync(enabledPath)) {
+            fs.unlinkSync(enabledPath);
+        }
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
 
