@@ -8,7 +8,11 @@ import { WebSocketServer } from 'ws';
 import { spawn, execSync } from 'child_process';
 import fs from 'fs';
 import { handleDeploymentLogs } from './controllers/repoController.js';
-
+import dotenv from 'dotenv';
+import { connectDB } from './utils/db.js';
+dotenv.config();
+// Connect to MongoDB
+connectDB();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
