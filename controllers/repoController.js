@@ -131,7 +131,7 @@ import RepoWebsite from "../models/repoWebsites.js";
 import { url } from "inspector";
 
 export const handleContainerization = async (req, res) => {
-  const { repo, stack, subdomain, port, subdirectory,existingSite } = req.body;
+  const { repo, stack, subdomain, port, subdirectory,existingSite,url } = req.body;
   if (!repo || !subdomain)
     return res.status(400).send("❌ Repo and subdomain required.");
   console.log(
@@ -152,6 +152,7 @@ export const handleContainerization = async (req, res) => {
       port,
       existingSite,
       encodedRepo: encodeURIComponent(repo),
+        url: url,
       subdirectory: subdirectory,
       error: "Subdomain already in use. Please choose another.",
     });
@@ -165,6 +166,7 @@ export const handleContainerization = async (req, res) => {
     port,
     existingSite,
     subdirectory: subdirectory,
+    url: url,
     encodedRepo: encodeURIComponent(repo),
   });
 };
@@ -290,8 +292,9 @@ export const handleDeploymentLogs = (ws, req) => {
 
         if(existingSite) {
         //if site already exists just update the port in the nginx config
-          const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
-          const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+        const subDomain=url.split(".")[0];
+          const confPath = `/etc/nginx/sites-available/${subDomain}.conf`;
+          const enabledPath = `/etc/nginx/sites-enabled/${subDomain}.conf`;
             const confContent = fs.readFileSync(confPath, 'utf-8');
             const updatedContent = confContent.replace(/proxy_pass http:\/\/localhost:\d+;/, `proxy_pass http://localhost:${port};`);
             fs.writeFileSync(confPath, updatedContent);
