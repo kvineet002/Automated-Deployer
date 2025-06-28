@@ -176,7 +176,7 @@ export const handleContainerization = async (req, res) => {
           port,
           existingSite:false,
           encodedRepo: encodeURIComponent(repo),
-          url: url,
+          url: `${subdomainSafe}.voomly.xyz`,
           subdirectory: subdirectory,
           error: "Subdomain already in use. Please choose another.",
         });
@@ -191,7 +191,7 @@ export const handleContainerization = async (req, res) => {
     port,
     existingSite,
     subdirectory: subdirectory,
-    url: url,
+    url: url || `${subdomainSafe}.voomly.xyz`,
     encodedRepo: encodeURIComponent(repo),
   });
 };
