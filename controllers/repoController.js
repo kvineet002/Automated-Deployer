@@ -168,7 +168,7 @@ export const handleContainerization = async (req, res) => {
       const existingSite = await RepoWebsite.findOne({
         clonedpath: tempPath,
       });
-      if (existingSite.url !== url) {
+      if (url&&existingSite.url !== url) {
         return res.render("result", {
           repo,
           stack,
