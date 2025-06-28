@@ -176,7 +176,7 @@ export const handleContainerization = async (req, res) => {
           startLogs: false,
           subdomain: subdomainSafe,
           port,
-          existingSite,
+          existingSite:false,
           encodedRepo: encodeURIComponent(repo),
           url: url,
           subdirectory: subdirectory,
