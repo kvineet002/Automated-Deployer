@@ -161,14 +161,14 @@ export const handleContainerization = async (req, res) => {
 
   // Check if subdomain is already in use
   if (fs.existsSync(enabledPath)) {
-    if (existingSite) {
+    if (!existingSite) {
       const repoName = repo.split("/").pop().replace(".git", "");
       var tempPath = path.join("./cloned_repos", repoName);
       tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
       const existingSite = await RepoWebsite.findOne({
         clonedpath: tempPath,
       });
-      if (url&&existingSite.url !== url) {
+      if ((url&&existingSite.url !== url)) {
         return res.render("result", {
           repo,
           stack,
