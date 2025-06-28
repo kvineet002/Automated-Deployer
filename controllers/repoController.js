@@ -161,7 +161,6 @@ export const handleContainerization = async (req, res) => {
 
   // Check if subdomain is already in use
   if (fs.existsSync(enabledPath)) {
-    if (!existingSite) {
       // const repoName = repo.split("/").pop().replace(".git", "");
       // var tempPath = path.join("./cloned_repos", repoName);
       // tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
@@ -184,7 +183,6 @@ export const handleContainerization = async (req, res) => {
           error: "Subdomain already in use. Please choose another.",
         });
       
-    }
   }
   // Render result.ejs with logs
   res.render("result", {
