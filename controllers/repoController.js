@@ -56,8 +56,8 @@ export const handleRepoSubmit = async (req, res) => {
   try {
     const branch = userBranch || (await getDefaultBranch(owner, repo));
 
-    if(process.env.NODE_ENV === "production") {
-    await cloneRepo(githubUrl, tempPath, branch);
+    if (process.env.NODE_ENV === "production") {
+      await cloneRepo(githubUrl, tempPath, branch);
     }
 
     // Adjust for subdirectory (if any)
@@ -66,51 +66,50 @@ export const handleRepoSubmit = async (req, res) => {
       : tempPath;
     console.log(`Cloned repo to: ${finalPath}`);
     const stack = detectStack(finalPath);
-    
-    if (stack === "Vite") {
-        return res.render("form", { error: "Vite apps are not supported yet." });
-    }
-    try{
-         const path = finalPath;
-  const existingSite = await RepoWebsite.findOne({ clonedpath: path });
-    if (existingSite) {
-      console.log(`Site already exists in MongoDB: ${existingSite.url}`);
-      const port = existingSite.port;
-        if (stack === "Node.js") {
-      addEnvFile(finalPath, envContent);
-      addNodeDockerfile(finalPath, detectEntryFile(finalPath));
-      addNodeDockerComposefile(
-        port,
-        detectIndexFilePORT(finalPath + "/" + detectEntryFile(finalPath)),
-        finalPath
-      );
-    }
 
-    if (stack === "React") {
-      addDockerfile(finalPath);
-      addDockerComposefile(port, finalPath);
-      addEnvFile(finalPath, envContent);
+    if (stack === "Vite") {
+      return res.render("form", { error: "Vite apps are not supported yet." });
     }
+    try {
+      const path = finalPath;
+      const existingSite = await RepoWebsite.findOne({ clonedpath: path });
+      if (existingSite) {
+        console.log(`Site already exists in MongoDB: ${existingSite.url}`);
+        const port = existingSite.port;
+        if (stack === "Node.js") {
+          addEnvFile(finalPath, envContent);
+          addNodeDockerfile(finalPath, detectEntryFile(finalPath));
+          addNodeDockerComposefile(
+            port,
+            detectIndexFilePORT(finalPath + "/" + detectEntryFile(finalPath)),
+            finalPath
+          );
+        }
+
+        if (stack === "React") {
+          addDockerfile(finalPath);
+          addDockerComposefile(port, finalPath);
+          addEnvFile(finalPath, envContent);
+        }
 
         return res.render("result", {
-        repo: githubUrl,
-      stack,
-      startLogs: false,
-      encodedRepo: encodeURIComponent(githubUrl),
-      port,
-      subdirectory: subdirectory,
-      existingSite: true,
-      url: existingSite.url,
-         });
-    } else {
-      console.log(`No existing site found for path: ${path}`);
-    }
-    }
-    catch (err) {
-        console.error(`Error checking subdirectory: ${err.message}`);
+          repo: githubUrl,
+          stack,
+          startLogs: false,
+          encodedRepo: encodeURIComponent(githubUrl),
+          port,
+          subdirectory: subdirectory,
+          existingSite: true,
+          url: existingSite.url,
+        });
+      } else {
+        console.log(`No existing site found for path: ${path}`);
+      }
+    } catch (err) {
+      console.error(`Error checking subdirectory: ${err.message}`);
     }
     const port = generatePORT();
-    
+
     if (stack === "Node.js") {
       addEnvFile(finalPath, envContent);
       addNodeDockerfile(finalPath, detectEntryFile(finalPath));
@@ -133,8 +132,8 @@ export const handleRepoSubmit = async (req, res) => {
       startLogs: false,
       encodedRepo: encodeURIComponent(githubUrl),
       port,
-        existingSite: false,
-        
+      existingSite: false,
+
       subdirectory: subdirectory,
     });
   } catch (err) {
@@ -148,7 +147,8 @@ import RepoWebsite from "../models/repoWebsites.js";
 import { url } from "inspector";
 
 export const handleContainerization = async (req, res) => {
-  const { repo, stack, subdomain, port, subdirectory,existingSite,url } = req.body;
+  const { repo, stack, subdomain, port, subdirectory, existingSite, url } =
+    req.body;
   if (!repo || !subdomain)
     return res.status(400).send("❌ Repo and subdomain required.");
   console.log(
@@ -160,7 +160,16 @@ export const handleContainerization = async (req, res) => {
   const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
   // Check if subdomain is already in use
-  if (fs.existsSync(enabledPath)&&!existingSite) {
+  if (fs.existsSync(enabledPath)) {
+    if (existingSite) {
+      const repoName = repo.split("/").pop().replace(".git", "");
+      var tempPath = path.join("./cloned_repos", repoName);
+      tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
+      const existingSite = await RepoWebsite.findOne({
+        clonedpath: tempPath,
+      });
+      if(existingSite.url !== url) {
+    
     return res.render("result", {
       repo,
       stack,
@@ -169,10 +178,11 @@ export const handleContainerization = async (req, res) => {
       port,
       existingSite,
       encodedRepo: encodeURIComponent(repo),
-        url: url,
+      url: url,
       subdirectory: subdirectory,
       error: "Subdomain already in use. Please choose another.",
     });
+      }
   }
   // Render result.ejs with logs
   res.render("result", {
@@ -193,12 +203,12 @@ export const handleDeploymentLogs = (ws, req) => {
   const subdomainSafe = urlParams.get("subdomainSafe");
   const port = urlParams.get("port");
   const subdirectory = urlParams.get("subdirectory");
-    const existingSite = urlParams.get("existingSite") === "true";
+  const existingSite = urlParams.get("existingSite") === "true";
   if (!repo || !subdomainSafe || !port) {
     ws.send("❌ Missing parameters");
     ws.close();
     return;
-  } 
+  }
 
   const repoName = repo.split("/").pop().replace(".git", "");
   var tempPath = path.join("./cloned_repos", repoName);
@@ -306,21 +316,23 @@ export const handleDeploymentLogs = (ws, req) => {
     run.stderr.on("data", (data) => ws.send(data.toString()));
 
     run.on("close", () => {
-
-        if(existingSite) {
+      if (existingSite) {
         //if site already exists just update the port in the nginx config
-          const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
-          const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
-            const confContent = fs.readFileSync(confPath, 'utf-8');
-            const updatedContent = confContent.replace(/proxy_pass http:\/\/localhost:\d+;/, `proxy_pass http://localhost:${port};`);
-            fs.writeFileSync(confPath, updatedContent);
-            fs.writeFileSync(enabledPath, updatedContent);
-            execSync("sudo nginx -s reload");
-          ws.send(`✅ Deployment successful! Site already exists.`);
-          ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
-          ws.close();
-          return;
-        }
+        const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+        const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+        const confContent = fs.readFileSync(confPath, "utf-8");
+        const updatedContent = confContent.replace(
+          /proxy_pass http:\/\/localhost:\d+;/,
+          `proxy_pass http://localhost:${port};`
+        );
+        fs.writeFileSync(confPath, updatedContent);
+        fs.writeFileSync(enabledPath, updatedContent);
+        execSync("sudo nginx -s reload");
+        ws.send(`✅ Deployment successful! Site already exists.`);
+        ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
+        ws.close();
+        return;
+      }
       ws.send(`Deployment successful!\nAssigning your subdomain...\n\n`);
 
       const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
@@ -358,7 +370,7 @@ server {
             const site = new RepoWebsite({
               clonedpath: tempPath,
               url: `${subdomainSafe}.voomly.xyz`,
-            port: port,
+              port: port,
             });
 
             await site.save();
