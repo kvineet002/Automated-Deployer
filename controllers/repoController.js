@@ -76,6 +76,22 @@ export const handleRepoSubmit = async (req, res) => {
     if (existingSite) {
       console.log(`Site already exists in MongoDB: ${existingSite.url}`);
       const port = existingSite.port;
+        if (stack === "Node.js") {
+      addEnvFile(finalPath, envContent);
+      addNodeDockerfile(finalPath, detectEntryFile(finalPath));
+      addNodeDockerComposefile(
+        port,
+        detectIndexFilePORT(finalPath + "/" + detectEntryFile(finalPath)),
+        finalPath
+      );
+    }
+
+    if (stack === "React") {
+      addDockerfile(finalPath);
+      addDockerComposefile(port, finalPath);
+      addEnvFile(finalPath, envContent);
+    }
+
         return res.render("result", {
         repo: githubUrl,
       stack,
