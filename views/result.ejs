@@ -267,15 +267,17 @@
                                         </div>
                                         <% } else { %>
                                             <!-- If already deployed, just pass the subdomain as hidden input -->
-                                            <input type="hidden" name="subdomain" value="<%= url.split('.')[0] %>" />
-                                            <% } %>
-                                                <% } %>
+                                            <% const subdomainFromUrl=(url || '' ).split('.')[0]; %>
+                                                <input type="hidden" name="subdomain" value="<%= subdomainFromUrl %>" />
 
-                                                    <% if (existingSite) { %>
-                                                        <button type="submit">Redeploy This App</button>
-                                                        <% } else { %>
-                                                            <button type="submit">Deploy This App</button>
-                                                            <% } %>
+                                                <% } %>
+                                                    <% } %>
+
+                                                        <% if (existingSite) { %>
+                                                            <button type="submit">Redeploy This App</button>
+                                                            <% } else { %>
+                                                                <button type="submit">Deploy This App</button>
+                                                                <% } %>
 
                     </form>
                     <% } %>
@@ -319,7 +321,7 @@
                                                             const data = event.data;
 
                                                             if (data.startsWith('nginx-ready:')) {
-                                                                const url = `https://${data.split(':')[1]}`;
+                                                                const url = `https://${data && data.split(':')[1]}`;
                                                                 const anchor = document.getElementById('site-anchor');
                                                                 anchor.href = url;
                                                                 anchor.textContent = `🔗 ${url}`;
