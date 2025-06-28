@@ -79,6 +79,7 @@ export const handleRepoSubmit = async (req, res) => {
         return res.render("result", {
         repo: githubUrl,
       stack,
+      subdomain: existingSite.url.split(".")[0],
       startLogs: false,
       encodedRepo: encodeURIComponent(githubUrl),
       port,
@@ -293,9 +294,8 @@ export const handleDeploymentLogs = (ws, req) => {
 
         if(existingSite) {
         //if site already exists just update the port in the nginx config
-        const subDomain=url.split(".")[0];
-          const confPath = `/etc/nginx/sites-available/${subDomain}.conf`;
-          const enabledPath = `/etc/nginx/sites-enabled/${subDomain}.conf`;
+          const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+          const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
             const confContent = fs.readFileSync(confPath, 'utf-8');
             const updatedContent = confContent.replace(/proxy_pass http:\/\/localhost:\d+;/, `proxy_pass http://localhost:${port};`);
             fs.writeFileSync(confPath, updatedContent);
