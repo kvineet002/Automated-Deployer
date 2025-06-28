@@ -1,8 +1,8 @@
 import { cloneRepo } from '../utils/gitUtils.js';
-import { detectStack } from '../models/stackDetector.js';
+import { detectEntryFile, detectIndexFilePORT, detectStack } from '../models/stackDetector.js';
 import fs from 'fs';
 import path from 'path';
-import { addDockerComposefile, addDockerfile, addEnvFile } from '../utils/dockerUtils.js';
+import { addDockerComposefile, addDockerfile, addEnvFile, addNodeDockerComposefile, addNodeDockerfile } from '../utils/dockerUtils.js';
 
 export const showForm = (req, res) => {
     res.render('form');
@@ -52,6 +52,12 @@ export const handleRepoSubmit = async (req, res) => {
 
         if (stack === 'Vite') {
             return res.render('form', { error: 'Vite apps are not supported yet.' });
+        }
+
+        if (stack === 'Node.js') {
+            addEnvFile(finalPath, envContent);
+            addNodeDockerfile(finalPath,detectEntryFile(finalPath));
+            addNodeDockerComposefile(port,detectIndexFilePORT(finalPath+detectEntryFile(finalPath)), finalPath);
         }
 
         if (stack === 'React') {

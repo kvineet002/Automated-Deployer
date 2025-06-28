@@ -43,3 +43,33 @@ export const addEnvFile = (repoPath, envContent) => {
         fs.writeFileSync(envFilePath, '');
     }
 };
+
+export const addNodeDockerfile = (repoPath,enterFile) => {
+    const dockerfileContent = `
+FROM node:20-alpine
+WORKDIR /app/backend
+COPY package*.json ./
+RUN npm ci --production
+COPY . .
+EXPOSE 3001
+CMD [ "node","${enterFile}" ]
+    `;
+    fs.writeFileSync(path.join(repoPath, 'Dockerfile'), dockerfileContent.trim());
+}
+export const addNodeDockerComposefile = (port,usersPort, repoPath) => {
+    const content = `
+services:
+  ${to_snakeCase(path.basename(repoPath))}:
+    image: ${to_snakeCase(path.basename(repoPath))}_image
+    container_name: ${to_snakeCase(path.basename(repoPath))}_container
+    restart: always
+    build:
+        context: .
+        dockerfile: Dockerfile
+    ports:
+      - "${port}:${usersPort}"
+    env_file: 
+      - .env.voomly
+    `; 
+    fs.writeFileSync(path.join(repoPath, 'docker-compose.yml'), content.trim());
+};
