@@ -359,8 +359,10 @@ server {
       try {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
+
         execSync("sudo nginx -s reload");
-        execSync("sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz");
+        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.send(
           `All done! Your app is now live at http://${subdomainSafe}.voomly.xyz`
