@@ -304,7 +304,7 @@
 
                                                     <div class="logs" id="logs">⏳ Streaming logs...<br /></div>
                                                     <script>
-                                                        const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>&subdirectory=<%= subdirectory %>&existingSite=<%= existingSite %>`);
+                                                        const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>&subdirectory=<%= subdirectory %>&existingSite=<%= existingSite %>&url=<%= url %>`);
 
                                                         socket.onmessage = (event) => {
                                                             const logsEl = document.getElementById('logs');
