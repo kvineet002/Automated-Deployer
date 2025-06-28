@@ -60,7 +60,10 @@ export const detectIndexFilePORT = (repoPath) => {
         // const port = 3000
         match = content.match(/(?:const|let|var)?\s*port\s*=\s*(\d{2,5})/i);
         if (match) return match[1];
-
+        //const PORT = 3000
+        match = content.match(/(?:const|let|var)?\s*PORT\s*=\s*(\d{2,5})/i);
+        if (match) return match[1];
+        
         // app.listen(3000)
         match = content.match(/\.listen\s*\(\s*(\d{2,5})\s*\)/);
         if (match) return match[1];
