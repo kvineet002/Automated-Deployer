@@ -318,18 +318,18 @@ export const handleDeploymentLogs = (ws, req) => {
     run.on("close", () => {
       if (existingSite) {
         //if site already exists just update the port in the nginx config
-        const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
-        const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
-        const confContent = fs.readFileSync(confPath, "utf-8");
-        console.log(confContent);
-        const updatedContent = confContent.replace(
-          /proxy_pass http:\/\/localhost:\d+;/,
-          `proxy_pass http://localhost:${port};`
-        );
-        console.log("updatedContent",updatedContent);
-        fs.writeFileSync(confPath, updatedContent);
-        fs.writeFileSync(enabledPath, updatedContent);
-        execSync("sudo nginx -s reload");
+        // const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+        // const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+        // const confContent = fs.readFileSync(confPath, "utf-8");
+        // console.log(confContent);
+        // const updatedContent = confContent.replace(
+        //   /proxy_pass http:\/\/localhost:\d+;/,
+        //   `proxy_pass http://localhost:${port};`
+        // );
+        // console.log("updatedContent",updatedContent);
+        // fs.writeFileSync(confPath, updatedContent);
+        // fs.writeFileSync(enabledPath, updatedContent);
+        // execSync("sudo nginx -s reload");
         ws.send(`✅ Deployment successful! Site already exists.`);
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.close();
