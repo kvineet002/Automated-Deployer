@@ -21,7 +21,7 @@ const getDefaultBranch = async (owner, repo) => {
 };
 
 export const handleRepoSubmit = async (req, res) => {
-    const { githubUrl, branch: userBranch, subdirectory = '' } = req.body;
+    const { githubUrl, branch: userBranch, subdirectory = '',envContent='' } = req.body;
 
     if (!githubUrl) {
         return res.render('form', { error: 'GitHub URL is required' });
@@ -57,6 +57,7 @@ export const handleRepoSubmit = async (req, res) => {
         if (stack === 'React') {
             addDockerfile(finalPath);
             addDockerComposefile(port, finalPath);
+            addEnvFile(finalPath, envContent);
         }
 
         res.render('result', {

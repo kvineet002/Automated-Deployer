@@ -26,7 +26,7 @@
 
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
@@ -223,28 +223,55 @@
             font-size: 14px;
             outline: none;
         }
-    svg{
-        transform: translateY(4px);
-        /* transform: translateX(-3px); */
-    }
-  .contact-footer {
-  margin-top: 20px;
-  font-size: 14px;
-  text-align: center;
-  color: #ccc;
-  line-height: 1.6;
-}
 
-.anchor-link {
-  color: var(--accent);
-  text-decoration: none;
-}
+        svg {
+            transform: translateY(4px);
+            /* transform: translateX(-3px); */
+        }
 
-.anchor-link:hover {
-  text-decoration: underline;
-}
+        .contact-footer {
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+            color: #ccc;
+            line-height: 1.6;
+        }
 
+        .anchor-link {
+            color: var(--accent);
+            text-decoration: none;
+        }
 
+        .anchor-link:hover {
+            text-decoration: underline;
+        }
+
+        .env-section {
+            margin-top: 0px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .env-section label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #f4f4f5;
+        }
+
+        .env-section textarea {
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-family: monospace;
+            resize: vertical;
+            font-size: 14px;
+            max-height: 150px;
+            outline: none;
+            min-height: 50px;
+        }
     </style>
 
 </head>
@@ -261,18 +288,15 @@
             <li>Set a subdomain, hit deploy</li>
             <li>Get a live URL instantly</li>
         </ul>
- <footer class="footer contact-footer">
-  <p>
-    Have questions or facing issues? Contact us at
-    <a class="anchor-link" href="mailto:vineet@voomly.xyz">vineet@voomly.xyz</a>
-  </p>
-  <p>
-    Want to contribute? Visit
-    <a class="anchor-link" href="https://github.com/kvineet002/Automated-Deployer" target="_blank" rel="noopener noreferrer">
-      GitHub Repo
-    </a>
-  </p>
-</footer>
+        <footer class="footer contact-footer">
+            <p>
+                Want to contribute? Visit
+                <a class="anchor-link" href="https://github.com/kvineet002/Automated-Deployer" target="_blank"
+                    rel="noopener noreferrer">
+                    GitHub Repo
+                </a>
+            </p>
+        </footer>
 
     </div>
 
@@ -284,10 +308,11 @@
             <input type="text" id="githubUrl" name="githubUrl" placeholder="https://github.com/user/repo" required />
 
             <div type="button" class="advanced-toggle" onclick="toggleAdvanced()">
-                  <span>Advanced Options</span>
-<svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20" fill="currentColor">
-  <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-</svg>
+                <span>Advanced Options</span>
+                <svg id="toggleIcon" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+                </svg>
 
             </div>
 
@@ -305,6 +330,12 @@
                     </select>
 
                 </div>
+                <div class="env-section">
+                    <label for="envContent">Paste your <code>.env</code> file (optional)</label>
+                    <textarea id="envContent" name="envContent" placeholder="PORT=3000&#10;API_KEY=your_key"
+                        rows="6"></textarea>
+                </div>
+
             </div>
             <button type="submit">Import</button>
         </form>
@@ -363,7 +394,7 @@
                 const repoUrl = document.getElementById('githubUrl').value.trim();
                 const selectedBranch = document.getElementById('branch').value.trim() || "main";
                 const match = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)(\.git)?$/);
-                if(!repoUrl)return;
+                if (!repoUrl) return;
                 if (!repoUrl || !match) {
                     alert("Invalid GitHub URL");
                     return;
@@ -407,17 +438,17 @@
                     console.error(err);
                 }
             }
-       function toggleAdvanced() {
-  const section = document.getElementById('advancedSection');
-  const icon = document.getElementById('toggleIcon');
-  const isVisible = section.style.display === 'block';
+            function toggleAdvanced() {
+                const section = document.getElementById('advancedSection');
+                const icon = document.getElementById('toggleIcon');
+                const isVisible = section.style.display === 'block';
 
-  section.style.display = isVisible ? 'none' : 'block';
+                section.style.display = isVisible ? 'none' : 'block';
 
-  icon.innerHTML = isVisible
-    ? '<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'  // down arrow
-    : '<path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>'; // up arrow
-}
+                icon.innerHTML = isVisible
+                    ? '<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'  // down arrow
+                    : '<path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>'; // up arrow
+            }
 
         </script>
 

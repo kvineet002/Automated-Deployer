@@ -15,6 +15,8 @@ services:
         context: .
     ports:
       - "${port}:3000"
+    env_file: 
+      - .env.voomly
     command: sh -c "cd /app && serve -s build"
   `;
 
@@ -33,3 +35,11 @@ RUN npm run build
     `;
     fs.writeFileSync(path.join(repoPath, 'Dockerfile'), dockerfileContent.trim());
 }
+export const addEnvFile = (repoPath, envContent) => {
+    const envFilePath = path.join(repoPath, '.env.voomly');
+    if (envContent) {
+        fs.writeFileSync(envFilePath, envContent.trim());
+    } else {
+        fs.writeFileSync(envFilePath, '');
+    }
+};
