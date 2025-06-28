@@ -162,13 +162,15 @@ export const handleContainerization = async (req, res) => {
   // Check if subdomain is already in use
   if (fs.existsSync(enabledPath)) {
     if (!existingSite) {
-      const repoName = repo.split("/").pop().replace(".git", "");
-      var tempPath = path.join("./cloned_repos", repoName);
-      tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
-      const existing = await RepoWebsite.findOne({
-        url: `${subdomainSafe}.voomly.xyz`,
-      });
-      if (existing && existing.clonedpath !== tempPath) {
+      // const repoName = repo.split("/").pop().replace(".git", "");
+      // var tempPath = path.join("./cloned_repos", repoName);
+      // tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
+      // const existing = await RepoWebsite.findOne({
+      //   url: `${subdomainSafe}.voomly.xyz`,
+      // });
+      // if (existing && existing.clonedpath === tempPath) {}
+      // else
+      
         return res.render("result", {
           repo,
           stack,
@@ -181,7 +183,7 @@ export const handleContainerization = async (req, res) => {
           subdirectory: subdirectory,
           error: "Subdomain already in use. Please choose another.",
         });
-      }
+      
     }
   }
   // Render result.ejs with logs
