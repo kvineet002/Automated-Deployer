@@ -57,7 +57,7 @@ export const handleRepoSubmit = async (req, res) => {
         if (stack === 'Node.js') {
             addEnvFile(finalPath, envContent);
             addNodeDockerfile(finalPath,detectEntryFile(finalPath));
-            addNodeDockerComposefile(port,detectIndexFilePORT(finalPath+detectEntryFile(finalPath)), finalPath);
+            addNodeDockerComposefile(port,detectIndexFilePORT(finalPath+'/'+detectEntryFile(finalPath)), finalPath);
         }
 
         if (stack === 'React') {
