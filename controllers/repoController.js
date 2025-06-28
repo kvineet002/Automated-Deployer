@@ -360,8 +360,27 @@ server {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
 
-        execSync("sudo nginx -s reload");
-        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+      const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz`;
+
+if (!fs.existsSync(certPath)) {
+  try {
+    // Run certbot BEFORE reloading nginx
+    execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+    console.log('✅ Certificate generated');
+  } catch (err) {
+    console.error(`❌ Failed to generate certificate: ${err.message}`);
+    ws.send(`❌ Failed to generate certificate: ${err.message}`);
+    return;
+  }
+}
+
+try {
+  execSync("sudo nginx -s reload");
+  console.log('✅ NGINX reloaded');
+} catch (err) {
+  console.error(`❌ Failed to reload NGINX: ${err.message}`);
+  ws.send(`❌ Failed to reload NGINX: ${err.message}`);
+}
 
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.send(
