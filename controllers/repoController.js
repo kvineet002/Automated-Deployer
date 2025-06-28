@@ -79,7 +79,6 @@ export const handleRepoSubmit = async (req, res) => {
         return res.render("result", {
         repo: githubUrl,
       stack,
-      subdomain: existingSite.url.split(".")[0],
       startLogs: false,
       encodedRepo: encodeURIComponent(githubUrl),
       port,

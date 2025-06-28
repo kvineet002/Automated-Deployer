@@ -254,22 +254,28 @@
                         <input type="hidden" name="port" value="<%= port %>" />
                         <input type="hidden" name="subdirectory" value="<%= subdirectory %>" />
                         <input type="hidden" name="existingSite" value="<%= existingSite %>" />
-<% if (existingSite) { %>
-  <input type="hidden" name="url" value="<%= url %>" />
-<% } %>
+                        <% if (existingSite) { %>
+                            <input type="hidden" name="url" value="<%= url %>" />
+                            <% } %>
 
-                        <% if (stack !=='Unknown'&&!existingSite ) { %>
-                            <div class="subdomain-input">
-                                <input type="text" name="subdomain" placeholder="Enter subdomain (e.g., myapp)"
-                                    required /><span class="highlight">.voomly.xyz</span>
-                            </div>
+                                <% if (stack !=='Unknown' ) { %>
+                                    <% if (!existingSite) { %>
+                                        <div class="subdomain-input">
+                                            <input type="text" name="subdomain"
+                                                placeholder="Enter subdomain (e.g., myapp)" required />
+                                            <span class="highlight">.voomly.xyz</span>
+                                        </div>
+                                        <% } else { %>
+                                            <!-- If already deployed, just pass the subdomain as hidden input -->
+                                            <input type="hidden" name="subdomain" value="<%= url.split('.')[0] %>" />
+                                            <% } %>
+                                                <% } %>
 
-                                        <%}%>
-                                                               <% if (existingSite) { %>
-                                <button type="submit">Redeploy This App</button>
-                                <% } else { %>
-                                    <button type="submit">Deploy This App</button>
-                                    <% } %>
+                                                    <% if (existingSite) { %>
+                                                        <button type="submit">Redeploy This App</button>
+                                                        <% } else { %>
+                                                            <button type="submit">Deploy This App</button>
+                                                            <% } %>
 
                     </form>
                     <% } %>
@@ -306,7 +312,7 @@
 
                                                     <div class="logs" id="logs">⏳ Streaming logs...<br /></div>
                                                     <script>
-                                                        const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>&subdirectory=<%= subdirectory %>&existingSite=<%= existingSite %>&url=<%= url %>`);
+                                                        const socket = new WebSocket(`wss://${window.location.host}/?repo=<%= encodedRepo %>&subdomainSafe=<%= subdomain %>&port=<%= port %>&subdirectory=<%= subdirectory %>&existingSite=<%= existingSite %>`);
 
                                                         socket.onmessage = (event) => {
                                                             const logsEl = document.getElementById('logs');
