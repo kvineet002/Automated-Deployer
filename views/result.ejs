@@ -238,9 +238,9 @@
                 <% if (existingSite) { %>
                     <div class="info-row">
                         <span class="label">Your Site:</span>
-                        <span class="value">
-                            <%= url %>
-                        </span>
+                        <a href=" https://<%= url %>" class="value">
+                            https://<%= url %>
+                        </a>
                     </div>
                     <% } %>
             </div>
@@ -264,14 +264,13 @@
                                     required /><span class="highlight">.voomly.xyz</span>
                             </div>
 
-                            <% if (existingSite) { %>
+                                        <%}%>
+                                                               <% if (existingSite) { %>
                                 <button type="submit">Redeploy This App</button>
                                 <% } else { %>
                                     <button type="submit">Deploy This App</button>
                                     <% } %>
 
-
-                                        <%}%>
                     </form>
                     <% } %>
                         <% } else { %>
