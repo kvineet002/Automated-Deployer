@@ -165,10 +165,10 @@ export const handleContainerization = async (req, res) => {
       const repoName = repo.split("/").pop().replace(".git", "");
       var tempPath = path.join("./cloned_repos", repoName);
       tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
-       const existing = await RepoWebsite.findOne({
+      const existing = await RepoWebsite.findOne({
         url: `${subdomainSafe}.voomly.xyz`,
       });
-      if ((existing&&existing.clonedpath !== tempPath)) {
+      if (existing && existing.clonedpath !== tempPath) {
         return res.render("result", {
           repo,
           stack,
@@ -359,10 +359,12 @@ server {
       try {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
+        const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz`;
 
+        if (!fs.existsSync(certPath)) {
+          execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+        }
         execSync("sudo nginx -s reload");
-        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz --staging`);
-
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.send(
           `All done! Your app is now live at http://${subdomainSafe}.voomly.xyz`
