@@ -361,7 +361,7 @@ server {
         fs.writeFileSync(enabledPath, confContent);
 
         execSync("sudo nginx -s reload");
-        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+        execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz --staging`);
 
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.send(
