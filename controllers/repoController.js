@@ -161,15 +161,13 @@ export const handleContainerization = async (req, res) => {
 
   // Check if subdomain is already in use
   if (fs.existsSync(enabledPath)) {
-      // const repoName = repo.split("/").pop().replace(".git", "");
-      // var tempPath = path.join("./cloned_repos", repoName);
-      // tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
-      // const existing = await RepoWebsite.findOne({
-      //   url: `${subdomainSafe}.voomly.xyz`,
-      // });
-      // if (existing && existing.clonedpath === tempPath) {}
-      // else
-      
+      const repoName = repo.split("/").pop().replace(".git", "");
+      var tempPath = path.join("./cloned_repos", repoName);
+      tempPath = subdirectory ? path.join(tempPath, subdirectory) : tempPath;
+      const existing = await RepoWebsite.findOne({
+        url: `${subdomainSafe}.voomly.xyz`,
+      });
+      if (existing && existing.clonedpath !== tempPath)
         return res.render("result", {
           repo,
           stack,
