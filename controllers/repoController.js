@@ -359,6 +359,7 @@ server {
       try {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
+        execSync("sudo nginx -s reload");
         const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz`;
         if (!fs.existsSync(certPath)) {
           // Certificate doesn't exist — run certbot
@@ -405,7 +406,6 @@ server {
             );
           }
         }
-        execSync("sudo nginx -s reload");
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
         ws.send(
           `All done! Your app is now live at http://${subdomainSafe}.voomly.xyz`
