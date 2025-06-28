@@ -118,6 +118,7 @@ export const handleRepoSubmit = async (req, res) => {
       encodedRepo: encodeURIComponent(githubUrl),
       port,
         existingSite: false,
+        
       subdirectory: subdirectory,
     });
   } catch (err) {
