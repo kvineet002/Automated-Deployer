@@ -337,10 +337,12 @@ export const handleDeploymentLogs = (ws, req) => {
       }
       ws.send(`Deployment successful!\nAssigning your subdomain...\n\n`);
 
-      const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
-      const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
+  const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/fullchain.pem`;
+const confPath = `/etc/nginx/sites-available/${subdomainSafe}.conf`;
+const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
-      const confContent = `
+// 🔧 Minimal HTTP-only NGINX config
+const confContent = `
 server {
     listen 80;
     server_name ${subdomainSafe}.voomly.xyz;
@@ -354,19 +356,25 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
-      `;
+`;
 
-      try {
-        fs.writeFileSync(confPath, confContent);
-        fs.writeFileSync(enabledPath, confContent);
+try {
+  fs.writeFileSync(confPath, confContent);
+  fs.writeFileSync(enabledPath, confContent);
+  execSync('sudo nginx -s reload');
+  console.log('✅ NGINX reloaded');
+} catch (err) {
+  console.error(`❌ Failed to reload NGINX: ${err.message}`);
+  ws.send(`❌ Failed to reload NGINX: ${err.message}`);
+  return;
+}
 
-      const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz`;
-
+// 🔐 Then get certificate
 if (!fs.existsSync(certPath)) {
   try {
-    // Run certbot BEFORE reloading nginx
     execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
-    console.log('✅ Certificate generated');
+    console.log('✅ Certificate issued');
+    ws.send(`✅ Certificate issued`);
   } catch (err) {
     console.error(`❌ Failed to generate certificate: ${err.message}`);
     ws.send(`❌ Failed to generate certificate: ${err.message}`);
@@ -374,35 +382,6 @@ if (!fs.existsSync(certPath)) {
   }
 }
 
-try {
-  execSync("sudo nginx -s reload");
-  console.log('✅ NGINX reloaded');
-} catch (err) {
-  console.error(`❌ Failed to reload NGINX: ${err.message}`);
-  ws.send(`❌ Failed to reload NGINX: ${err.message}`);
-}
-
-        ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
-        ws.send(
-          `All done! Your app is now live at http://${subdomainSafe}.voomly.xyz`
-        );
-        try {
-          (async () => {
-            const site = new RepoWebsite({
-              clonedpath: tempPath,
-              url: `${subdomainSafe}.voomly.xyz`,
-              port: port,
-            });
-
-            await site.save();
-            console.log(`✅ Site saved to MongoDB: ${site.url}`);
-          })();
-        } catch (dbErr) {
-          console.error(`❌ Failed to save site to MongoDB:`, dbErr);
-        }
-      } catch (err) {
-        ws.send(`❌ Failed to configure NGINX: ${err.message}`);
-      }
       ws.close();
     });
   });
