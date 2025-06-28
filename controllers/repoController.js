@@ -168,21 +168,21 @@ export const handleContainerization = async (req, res) => {
       const existingSite = await RepoWebsite.findOne({
         clonedpath: tempPath,
       });
-      if(existingSite.url !== url) {
-    
-    return res.render("result", {
-      repo,
-      stack,
-      startLogs: false,
-      subdomain: subdomainSafe,
-      port,
-      existingSite,
-      encodedRepo: encodeURIComponent(repo),
-      url: url,
-      subdirectory: subdirectory,
-      error: "Subdomain already in use. Please choose another.",
-    });
+      if (existingSite.url !== url) {
+        return res.render("result", {
+          repo,
+          stack,
+          startLogs: false,
+          subdomain: subdomainSafe,
+          port,
+          existingSite,
+          encodedRepo: encodeURIComponent(repo),
+          url: url,
+          subdirectory: subdirectory,
+          error: "Subdomain already in use. Please choose another.",
+        });
       }
+    }
   }
   // Render result.ejs with logs
   res.render("result", {
@@ -196,7 +196,7 @@ export const handleContainerization = async (req, res) => {
     url: url,
     encodedRepo: encodeURIComponent(repo),
   });
-}};
+};
 export const handleDeploymentLogs = (ws, req) => {
   const urlParams = new URLSearchParams(req.url.replace("/?", ""));
   const repo = urlParams.get("repo");
