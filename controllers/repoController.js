@@ -56,7 +56,9 @@ export const handleRepoSubmit = async (req, res) => {
   try {
     const branch = userBranch || (await getDefaultBranch(owner, repo));
 
-    // await cloneRepo(githubUrl, tempPath, branch);
+    if(process.env.NODE_ENV === "production") {
+    await cloneRepo(githubUrl, tempPath, branch);
+    }
 
     // Adjust for subdirectory (if any)
     const finalPath = subdirectory

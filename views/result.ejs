@@ -260,13 +260,15 @@
                                     required /><span class="highlight">.voomly.xyz</span>
                             </div>
                             <% if (existingSite) { %>
-                                                           <button type="submit">Redeploy This App</button>
-                            <% } %>
-                            else {%>
-                                                        <button type="submit">Deploy This App</button>
-                           <% }
+                                <div class="info-row">
+                                    <span class="label">Your Site:</span>
+                                    <span class="value">
+                                        <%= url %>
+                                    </span>
+                                </div>
+                                <% } %>
 
-                            <%}%>
+                                    <%}%>
                     </form>
                     <% } %>
                         <% } else { %>
