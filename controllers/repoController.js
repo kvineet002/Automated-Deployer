@@ -360,9 +360,50 @@ server {
         fs.writeFileSync(confPath, confContent);
         fs.writeFileSync(enabledPath, confContent);
         const certPath = `/etc/letsencrypt/live/${subdomainSafe}.voomly.xyz`;
-
         if (!fs.existsSync(certPath)) {
+          // Certificate doesn't exist — run certbot
           execSync(`sudo certbot --nginx -d ${subdomainSafe}.voomly.xyz`);
+        } else {
+          // Certificate exists — inject SSL block if not already present
+          const confContent = fs.readFileSync(confPath, "utf8");
+          if (!confContent.includes("listen 443 ssl")) {
+            const sslBlock = `
+server {
+    listen 443 ssl; # managed by Certbot
+    server_name ${subdomainSafe}.voomly.xyz;
+
+    ssl_certificate /etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${subdomainSafe}.voomly.xyz/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location / {
+        proxy_pass http://localhost:${port};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+server {
+    if ($host = ${subdomainSafe}.voomly.xyz) {
+        return 301 https://$host$request_uri;
+    }
+    server_name ${subdomainSafe}.voomly.xyz;
+    listen 80;
+    return 404;
+}
+`;
+
+            fs.appendFileSync(confPath, sslBlock);
+            console.log(`✅ SSL block appended to ${confPath}`);
+          } else {
+            console.log(
+              `🔒 SSL block already exists for ${subdomainSafe}.voomly.xyz`
+            );
+          }
         }
         execSync("sudo nginx -s reload");
         ws.send(`nginx-ready:${subdomainSafe}.voomly.xyz`);
