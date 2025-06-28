@@ -28,7 +28,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 RUN npm install -g serve
 COPY package* ./
-RUN npm install
+RUN npm ci --production
 COPY . .
 ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
