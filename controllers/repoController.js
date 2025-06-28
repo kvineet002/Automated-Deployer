@@ -196,7 +196,7 @@ export const handleContainerization = async (req, res) => {
     url: url,
     encodedRepo: encodeURIComponent(repo),
   });
-};
+}};
 export const handleDeploymentLogs = (ws, req) => {
   const urlParams = new URLSearchParams(req.url.replace("/?", ""));
   const repo = urlParams.get("repo");
