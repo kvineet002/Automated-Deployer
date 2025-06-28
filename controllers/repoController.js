@@ -144,7 +144,7 @@ export const handleContainerization = async (req, res) => {
   const enabledPath = `/etc/nginx/sites-enabled/${subdomainSafe}.conf`;
 
   // Check if subdomain is already in use
-  if (fs.existsSync(enabledPath)) {
+  if (fs.existsSync(enabledPath)&&!existingSite) {
     return res.render("result", {
       repo,
       stack,
