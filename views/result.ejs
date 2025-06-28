@@ -238,7 +238,7 @@
             </div>
 
 
-            <% if (stack==='React' ) { %>
+            <% if (stack==='React'||stack==='Node.js' ) { %>
                 <% if (!startLogs) { %>
                     <form action="/deploy" method="POST">
                         <input type="hidden" name="repo" value="<%= repo %>" />
